@@ -1,11 +1,15 @@
-// import 'dart:html';
-
 import 'package:flutter/material.dart';
+import 'package:propstock/providers/assets.dart';
 import 'package:propstock/providers/buy.dart';
+import 'package:propstock/providers/contact.dart';
+import 'package:propstock/providers/faqs.dart';
 import 'package:propstock/providers/investments.dart';
+import 'package:propstock/providers/marketplace.dart';
+import 'package:propstock/providers/notifications.dart';
 import 'package:propstock/providers/payment.dart';
 import 'package:propstock/providers/portfolio.dart';
 import 'package:propstock/providers/property.dart';
+import 'package:propstock/screens/affiliate/affiliate.dart';
 import 'package:propstock/screens/assets/assets.dart';
 import 'package:propstock/screens/bank_account/add_bank_account.dart';
 import 'package:propstock/screens/bank_account/confirm_bank_account.dart';
@@ -16,15 +20,23 @@ import 'package:propstock/screens/buy_property/co_buy_final_page.dart';
 import 'package:propstock/screens/buy_property/doc_handover.dart';
 import 'package:propstock/screens/buy_property/filter_buy_property.dart';
 import 'package:propstock/screens/buy_property/send_property_as_gifts.dart';
+import 'package:propstock/screens/contactus/chat.dart';
+import 'package:propstock/screens/contactus/contactus.dart';
 import 'package:propstock/screens/create_new_pin.dart';
 import 'package:propstock/screens/create_new_pin_confirm.dart';
 import 'package:propstock/screens/dashboard.dart';
+import 'package:propstock/screens/delete_account/delete_account.dart';
+import 'package:propstock/screens/delete_account/delete_account_final.dart';
+import 'package:propstock/screens/edit_profile/edit_profile.dart';
+import 'package:propstock/screens/edit_profile/edit_profile_b.dart';
 import 'package:propstock/screens/email_code_verify.dart';
+import 'package:propstock/screens/faqs.dart';
 import 'package:propstock/screens/filter_dashboard.dart';
 import 'package:propstock/screens/forgot_password.dart';
 import 'package:propstock/screens/forgot_pin.dart';
 import 'package:propstock/screens/friends/myfriends.dart';
 import 'package:propstock/screens/got_verification_mail.dart';
+import 'package:propstock/screens/home/profile.dart';
 import 'package:propstock/screens/income_range.dart';
 import 'package:propstock/screens/invest/co_invest.dart';
 import 'package:propstock/screens/invest/co_invest_final.dart';
@@ -40,18 +52,39 @@ import 'package:propstock/screens/loading_screen.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/screens/location_select.dart';
 import 'package:propstock/screens/marketplace/market_place.dart';
+import 'package:propstock/screens/marketplace/market_place_bid.dart';
+import 'package:propstock/screens/marketplace/market_place_bid_analytics.dart';
+import 'package:propstock/screens/marketplace/market_place_filter.dart';
+import 'package:propstock/screens/marketplace/market_place_product_analytics.dart';
 import 'package:propstock/screens/notifications/notifications.dart';
+import 'package:propstock/screens/notifications_profile/notifications_profile.dart';
 import 'package:propstock/screens/onboarding.dart';
 import 'package:propstock/screens/payment_card/add_card.dart';
+import 'package:propstock/screens/payment_method/debit_cards.dart';
+import 'package:propstock/screens/payment_method/payment_method.dart';
+import 'package:propstock/screens/payment_method/single_debit_card.dart';
+import 'package:propstock/screens/preferences/preferences.dart';
 import 'package:propstock/screens/primary_goal.dart';
+import 'package:propstock/screens/privacy_and_safety/privacy_and_safety.dart';
+import 'package:propstock/screens/privacy_policy.dart';
 import 'package:propstock/screens/property_all_investment_type.dart';
 import 'package:propstock/screens/property_detail/property_detail.dart';
 import 'package:propstock/screens/property_preference.dart';
+import 'package:propstock/screens/security/add_phone_number.dart';
+import 'package:propstock/screens/security/enter_password_to_proceed.dart';
+import 'package:propstock/screens/security/reset_password.dart';
+import 'package:propstock/screens/security/reset_password_final.dart';
+import 'package:propstock/screens/security/security.dart';
+import 'package:propstock/screens/security/two_factor_auth.dart';
+import 'package:propstock/screens/security/verifyPhone.dart';
+import 'package:propstock/screens/security/verifyPhoneFromSignIn.dart';
 import 'package:propstock/screens/sign_in_pin.dart';
 import 'package:propstock/screens/sign_in_with_password.dart';
 import 'package:propstock/screens/signup.dart';
 import 'package:propstock/screens/invest/buy_units_invest_page.dart';
+import 'package:propstock/screens/terms_and_conditions.dart';
 import 'package:propstock/screens/verify_account/verify_account.dart';
+import 'package:propstock/screens/verify_identity/verify_identity.dart';
 import 'package:propstock/screens/wallet/switch_cards.dart';
 import 'package:propstock/screens/wallet/wallet_transaction_page.dart';
 import 'package:provider/provider.dart';
@@ -63,8 +96,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return const MyHomePage();
@@ -89,6 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
         ChangeNotifierProvider(create: (context) => PortfolioProvider()),
         ChangeNotifierProvider(create: (context) => InvestmentsProvider()),
         ChangeNotifierProvider(create: (context) => BuyPropertyProvider()),
+        ChangeNotifierProvider(create: (context) => NotificationProvider()),
+        ChangeNotifierProvider(create: (context) => MarketPlaceProvider()),
+        ChangeNotifierProvider(create: (context) => FaqsProvider()),
+        ChangeNotifierProvider(create: (context) => ContactProvider()),
+        ChangeNotifierProvider(create: (context) => AssetsProvider()),
       ],
       child: OverlaySupport(
         child: MaterialApp(
@@ -148,6 +184,7 @@ class _MyHomePageState extends State<MyHomePage> {
             WalletTransactionPage.id: (context) =>
                 const WalletTransactionPage(),
             FilterBuyProperty.id: (context) => const FilterBuyProperty(),
+            MarketPlaceFilter.id: (context) => const MarketPlaceFilter(),
             BuyPropertyDetailOverview.id: (context) =>
                 const BuyPropertyDetailOverview(),
             BuyPropertyUnitsPage.id: (context) => const BuyPropertyUnitsPage(),
@@ -157,8 +194,41 @@ class _MyHomePageState extends State<MyHomePage> {
             CoBuyFinalPage.id: (context) => const CoBuyFinalPage(),
             Assets.id: (context) => const Assets(),
             MyFriends.id: (context) => const MyFriends(),
-            NotificationsPage.id: (context) => const NotificationsPage()
+            NotificationsPage.id: (context) => const NotificationsPage(),
+            AffiliatePage.id: (context) => const AffiliatePage(),
+            MarketPlaceBid.id: (context) => const MarketPlaceBid(),
+            MarketPlaceBidAnalytics.id: (context) =>
+                const MarketPlaceBidAnalytics(),
+            TermsAndConditions.id: (context) => const TermsAndConditions(),
+            PrivacyPolicy.id: (context) => const PrivacyPolicy(),
+            FAQs.id: (context) => const FAQs(),
+            Profile.id: (context) => const Profile(),
+            ContactUs.id: (context) => const ContactUs(),
+            ChatContactUs.id: (context) => const ChatContactUs(),
+            Security.id: (context) => const Security(),
+            ResetPassword.id: (context) => const ResetPassword(),
+            ResetPasswordFinal.id: (context) => const ResetPasswordFinal(),
+            TwoFactorAuth.id: (context) => const TwoFactorAuth(),
+            EnterPasswordToProceed.id: (context) =>
+                const EnterPasswordToProceed(),
+            AddPhoneNumber2fa.id: (context) => const AddPhoneNumber2fa(),
+            verifyPhone.id: (context) => const verifyPhone(),
+            PrivacyAndSafety.id: (context) => PrivacyAndSafety(),
+            DeleteAccount.id: (context) => const DeleteAccount(),
+            DeleteAccountFinal.id: (context) =>
+                const DeleteAccountFinal(), // MarketPlaceProductAnalytics.id: (context)=> MarketPlaceProductAnalytics()
             // SingleFriend.id: (context) => SingleFriend(),
+            VerifyPhoneFromSignIn.id: (context) =>
+                const VerifyPhoneFromSignIn(),
+            NotificationsProfile.id: (context) => const NotificationsProfile(),
+            EditProfile.id: (context) => const EditProfile(),
+            EditProfileB.id: (context) => const EditProfileB(),
+            Preferences.id: (context) => Preferences(),
+            VerifyIdentity.id: (context) => const VerifyIdentity(),
+            PaymentMethodProfile.id: (context) => const PaymentMethodProfile(),
+            DebitCardsProfile.id: (context) => const DebitCardsProfile(),
+            SingleDebitCardProfile.id: (context) =>
+                const SingleDebitCardProfile()
           },
         ),
       ),

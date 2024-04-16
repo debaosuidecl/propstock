@@ -21,7 +21,8 @@ class WalletCard extends StatelessWidget {
         NumberFormat.currency(locale: 'en_US', symbol: "${wallet!.currency} ");
     return Container(
       clipBehavior: Clip.hardEdge,
-      height: 214,
+      // height: 214,
+      // padding: EdgeInsets.symmetric(vertical: 20),
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
           color: MyColors.primary,
@@ -68,7 +69,7 @@ class WalletCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * .6,
+                      width: MediaQuery.of(context).size.width * .4,
                       child: FittedBox(
                         child: Text(formatter.format(wallet!.amount),
                             // overflow: TextOverflow.ellipsis,
@@ -97,71 +98,74 @@ class WalletCard extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: InkWell(
-                          onTap: topupHandler,
-                          child: Container(
-                            alignment: Alignment.center,
-                            // width: Medi,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(
-                                  8,
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: InkWell(
+                            onTap: topupHandler,
+                            child: Container(
+                              alignment: Alignment.center,
+                              // width: Medi,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    8,
+                                  ),
                                 ),
+                                color: Colors.white,
                               ),
-                              color: Colors.white,
-                            ),
-                            child: Text(
-                              "Top Up",
-                              style: TextStyle(
-                                color: MyColors.primary,
-                                fontFamily: "Inter",
-                                fontWeight: FontWeight.w600,
+                              child: Text(
+                                "Top Up",
+                                style: TextStyle(
+                                  color: MyColors.primary,
+                                  fontFamily: "Inter",
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: InkWell(
-                          onTap: withdrawHandler,
-                          child: Container(
-                            alignment: Alignment.center,
-                            // width: 158,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(
-                                  8,
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: InkWell(
+                            onTap: withdrawHandler,
+                            child: Container(
+                              alignment: Alignment.center,
+                              // width: 158,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(
+                                    8,
+                                  ),
                                 ),
+                                border: Border.all(
+                                  color: Colors.white,
+                                ),
+                                color: Colors.transparent,
                               ),
-                              border: Border.all(
-                                color: Colors.white,
-                              ),
-                              color: Colors.transparent,
-                            ),
-                            child: Text(
-                              "Withdraw",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Inter",
-                                fontWeight: FontWeight.w600,
+                              child: Text(
+                                "Withdraw",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: "Inter",
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 )
               ],
             ),

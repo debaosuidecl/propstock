@@ -33,7 +33,7 @@ class _EmailCodeVerifyState extends State<EmailCodeVerify> {
       await Provider.of<Auth>(context, listen: false).tryAutoLogin();
       _email = await Provider.of<Auth>(context, listen: false).email;
     } catch (e) {
-      showErrorDialog(e.toString(), context);
+      // showErrorDialog(e.toString(), context);
     } finally {
       setState(() {
         _loading = false;

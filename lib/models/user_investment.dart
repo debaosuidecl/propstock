@@ -13,7 +13,7 @@ class UserInvestment {
   int quantity;
   double pricePerUnitAtPurchase;
   double amountWithdrawn;
-
+  int? createdAt;
   UserInvestment({
     required this.property,
     this.isCoInvestor,
@@ -26,5 +26,6 @@ class UserInvestment {
     required this.pricePerUnitAtPurchase,
     required this.id,
     required this.amountWithdrawn,
+    this.createdAt,
   });
 }

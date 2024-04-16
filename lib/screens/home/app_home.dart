@@ -52,10 +52,10 @@ class _AppHomeState extends State<AppHome> {
       "color": Color(0xffF55D3E),
     },
     {
-      "title": "Earn by Referring",
+      "title": "Become an affiliate",
       "img": "images/hand_in_hand.svg",
-      "desc": "Earn by referring",
-      "actionText": "Refer",
+      "desc": "Grow your networth by becoming an affiliate",
+      "actionText": "Find a match",
       "action": () {
         // go to action
       },
@@ -224,8 +224,10 @@ class _AppHomeState extends State<AppHome> {
             ),
             Container(
               height: 450,
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(10),
               child: GridView.builder(
+                physics: NeverScrollableScrollPhysics(), // Disable scrolling
+
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2, // Number of columns in the grid
                   crossAxisSpacing: 10,

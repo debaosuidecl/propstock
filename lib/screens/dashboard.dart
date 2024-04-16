@@ -5,6 +5,7 @@ import 'package:propstock/screens/buy_property/buy_property.dart';
 import 'package:propstock/screens/home/app_home.dart';
 import 'package:propstock/screens/invest.main.dart';
 import 'package:propstock/screens/loading_screen.dart';
+import 'package:propstock/screens/marketplace/market_place.dart';
 import 'package:propstock/screens/wallet/wallet.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,7 @@ class _DashboardState extends State<Dashboard> {
     const Invest(),
     const WalletPage(),
     const BuyProperty(),
-    const SingleChildScrollView(),
+    const MarketPlace(),
   ];
   Container buildMyNavBar(BuildContext context) {
     return Container(

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:propstock/providers/auth.dart';
@@ -25,10 +27,16 @@ class _InvestState extends State<Invest> {
         child: Column(
           children: [
             Container(
-              decoration: const BoxDecoration(color: Colors.white, boxShadow: [
-                BoxShadow(
-                    color: Color(0xffeeeeee), spreadRadius: 3, blurRadius: 5)
-              ]),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: Platform.isIOS
+                      ? null
+                      : [
+                          BoxShadow(
+                              color: Color(0xffeeeeee),
+                              spreadRadius: 3,
+                              blurRadius: 5)
+                        ]),
               padding: const EdgeInsets.symmetric(
                 // horizontal: 8.0,
                 vertical: 20.0,

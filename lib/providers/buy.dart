@@ -79,6 +79,13 @@ class BuyPropertyProvider with ChangeNotifier {
 
   void removeFromAllProp(String prop) {
     selectedFurnitures.remove(prop);
+
+    if (prop.contains("min price")) {
+      minPrice = 0;
+    }
+    if (prop.contains("max price")) {
+      maxPrice = 500000;
+    }
     if (selectedFurnitures.isEmpty) {
       selectedFurnitures = ["All"];
     }
@@ -120,6 +127,7 @@ class BuyPropertyProvider with ChangeNotifier {
     double selectedMinPrice,
     String sbedNumber,
     String sbathNumber,
+    // RangeValues minMax
   ) {
     try {
       if (sbathNumber.isNotEmpty) {
@@ -144,6 +152,10 @@ class BuyPropertyProvider with ChangeNotifier {
       selectedfacilities = sfacilities.isEmpty ? ["All"] : sfacilities;
 
       filterMode = true;
+      allProps.removeWhere((element) =>
+          element.contains("min price ") || element.contains("max price "));
+      allProps.add("min price $currency${minPrice * factor}");
+      allProps.add("max price $currency${maxPrice * factor}");
 
       if (selectedState.isNotEmpty) {
         allProps.add(selectedState);
@@ -208,7 +220,7 @@ class BuyPropertyProvider with ChangeNotifier {
       print(responseData);
       List<Property> properties = [];
       for (var i = 0; i < responseData.length; i++) {
-        dynamic propItem = responseData[i]['friend'];
+        dynamic propItem = responseData[i];
         try {
           Property property = formatProperty(propItem);
           properties.add(property);

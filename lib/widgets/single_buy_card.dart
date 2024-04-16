@@ -26,7 +26,7 @@ class SingleBuyCard extends StatelessWidget {
       // height: ,
       margin: EdgeInsets.only(bottom: 25),
       padding: const EdgeInsets.symmetric(
-        horizontal: 20,
+        horizontal: 10,
         // vertical: 0,
       ),
       decoration: BoxDecoration(
@@ -171,7 +171,7 @@ class SingleBuyCard extends StatelessWidget {
                                 "${property.bedNumber} Bed",
                                 style: TextStyle(
                                   color: MyColors.primary,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontFamily: "Inter",
                                 ),
                               ),
@@ -186,7 +186,7 @@ class SingleBuyCard extends StatelessWidget {
                                 "${property.bathNumber} Bath",
                                 style: TextStyle(
                                   color: MyColors.primary,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontFamily: "Inter",
                                 ),
                               ),
@@ -201,7 +201,7 @@ class SingleBuyCard extends StatelessWidget {
                                 "${property.plotNumber}plots",
                                 style: TextStyle(
                                   color: MyColors.primary,
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   fontFamily: "Inter",
                                 ),
                               ),

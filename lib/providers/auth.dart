@@ -15,16 +15,32 @@ class Auth with ChangeNotifier {
   String? _token;
   // DateTime _expiryDate;
   String? _userId;
+
+  String? _gender;
+  String? _primaryLanguage;
+  List<dynamic>? _preferredStates;
+  String? _maritalStatus;
+  String? _religion;
+  bool? _hasPets;
+  List<dynamic>? _personalityTypes;
+  bool? _twofaenabled;
+  bool? _requirestwofa;
+  bool? _emailnotify;
+  bool? _pushnotify;
   String? _userType;
+  int? _dateOfBirth;
   String? _dailingcode;
   String? _fullName;
   String? _firstName;
   String? _lastName;
   String? _companyName;
+  String? _countrystring;
   String? _companyAddress;
   String? _loginMethod;
   String? _userName;
   String? _email;
+  String? _phoneFor2fa;
+  String _tempPassword = "";
   String? _phone;
   String? _profilepic;
   int? _regStep;
@@ -36,11 +52,14 @@ class Auth with ChangeNotifier {
   String? _investmentExperience = "";
   String? _incomeRange = "";
   List<dynamic> _stateList = [];
+  List<String> _stateListString = [];
   List<dynamic> _dynamicStateList = [];
+  List<String> _dynamicStateListString = [];
+  List<dynamic>? _propertyTypes = [];
   String? _newPin;
   String _selectedState = "";
   String _selectedCurrency = "USD";
-  List<dynamic> _primaryGoals = [];
+  List<dynamic>? _primaryGoals = [];
   bool? _profileSurveyShown;
   bool _isDocuVerified = false;
   // Timer _authTimer;
@@ -56,8 +75,78 @@ class Auth with ChangeNotifier {
     return _isDocuVerified;
   }
 
+  String? get investmentExperience {
+    return _investmentExperience;
+  }
+
+  List<dynamic>? get propertyTypes {
+    return _propertyTypes;
+  }
+
   String? get newPin {
     return _newPin;
+  }
+
+  String? get incomeRange {
+    return _incomeRange;
+  }
+
+  int? get dateOfBirth {
+    return _dateOfBirth;
+  }
+
+  bool? get twofaenabled {
+    return _twofaenabled;
+  }
+
+  bool? get requirestwofa {
+    return _requirestwofa;
+  }
+
+  bool? get getemailnotify {
+    return _emailnotify;
+  }
+
+  bool? get getpushnotify {
+    return _pushnotify;
+  }
+
+  // String? _gender;
+  // String? _primaryLanguage;
+  // String? _maritalStatus;
+  // String? _religion;
+  // bool? _hasPets;
+  // List<dynamic>? _personalityTypes;
+  String? get phoneFor2fa {
+    return _phoneFor2fa;
+  }
+
+  List<dynamic>? get preferredStates {
+    return _preferredStates;
+  }
+
+  String? get gender {
+    return _gender;
+  }
+
+  String? get primaryLanguage {
+    return _primaryLanguage;
+  }
+
+  String? get maritalStatus {
+    return _maritalStatus;
+  }
+
+  String? get religion {
+    return _religion;
+  }
+
+  bool? get hasPets {
+    return _hasPets;
+  }
+
+  List<dynamic>? get personalityTypes {
+    return _personalityTypes;
   }
 
   String get selectedState {
@@ -81,6 +170,14 @@ class Auth with ChangeNotifier {
     return _stateList;
   }
 
+  List<String> get stateListString {
+    return _stateListString;
+  }
+
+  List<String> get dynamicStateListString {
+    return _dynamicStateListString;
+  }
+
   List<dynamic> get dynamicStateList {
     return _dynamicStateList;
   }
@@ -95,6 +192,10 @@ class Auth with ChangeNotifier {
 
   Country? get country {
     return _country;
+  }
+
+  String? get countrystring {
+    return _countrystring;
   }
 
   String? get _ {
@@ -128,8 +229,17 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
+  String get tempPassword {
+    return _tempPassword;
+  }
+
   void setNewPin(String pin) {
     _newPin = pin;
+    notifyListeners();
+  }
+
+  void setTempPassword(String tp) {
+    _tempPassword = tp;
     notifyListeners();
   }
 
@@ -153,9 +263,18 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
+  void setPhoneFor2fa(String phone) {
+    _phoneFor2fa = phone;
+    notifyListeners();
+  }
+
   void setPrimaryGoals(List<String> goals) {
     _primaryGoals = goals;
     notifyListeners();
+  }
+
+  List<dynamic>? get primaryGoals {
+    return _primaryGoals;
   }
 
   bool logintest(String email, String password) {
@@ -401,6 +520,11 @@ class Auth with ChangeNotifier {
     return _authenticate(email, password, false, firstName, lastName);
   }
 
+  Future<void> signin(
+      String firstName, String lastName, String email, String password) async {
+    return _authenticate(email, password, true, firstName, lastName);
+  }
+
   Future<void> getIP() async {
     final url = "https://ip.nf/me.json";
     final response = await http.get(Uri.parse(url));
@@ -440,6 +564,256 @@ class Auth with ChangeNotifier {
       final responseData = json.decode(response.body);
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> changePassword(String password) async {
+    String url = "$_serverName/api/user/change-password";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({"password": password}));
+
+      final responseData = json.decode(response.body);
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> enable2fa(String phone) async {
+    String url = "$_serverName/api/user/enable2fa";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({"phonenumber": phone}));
+
+      _phoneFor2fa = phone;
+      final responseData = json.decode(response.body);
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> verify2fa(String code) async {
+    String url = "$_serverName/api/user/verify2fa";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({"code": code, "phonenumber": _phoneFor2fa}));
+
+      // _phoneFor2fa = phone;
+      final responseData = json.decode(response.body);
+      _twofaenabled = true;
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    String url = "$_serverName/api/user/deleteaccount";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({}));
+
+      // _phoneFor2fa = phone;
+      final responseData = json.decode(response.body);
+      _twofaenabled = true;
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<String?> uploadImage(File imageFile) async {
+    String url = "$_serverName/api/user/imageupload";
+
+    try {
+      print(imageFile);
+      final token = await gettoken();
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(url),
+      );
+      request.headers['x-auth-token'] = token;
+
+      request.files.add(
+        await http.MultipartFile.fromPath('image', imageFile.path),
+      );
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+
+        //  final responseData = json.decode(response);
+        var streamedResponse = await http.Response.fromStream(response);
+
+        // Decode the JSON data from the response body
+        var responseData = json.decode(streamedResponse.body);
+
+        _profilepic = responseData["data"]["avatar"];
+
+        print(_profilepic);
+
+        notifyListeners();
+
+        return profilepic;
+      } else {
+        print('Failed to upload image');
+        throw ("Failed to upload image");
+      }
+    } catch (e) {
+      print(e);
+
+      rethrow;
+    }
+  }
+
+  Future<void> updateAccount(
+      {String? gender,
+      String? investmentExperience,
+      String? incomeRange,
+      String? primaryLanguage,
+      List<dynamic>? preferredStates,
+      List<dynamic>? primaryGoals,
+      String? maritalStatus,
+      String? religion,
+      bool? hasPets,
+      String? email,
+      String? firstName,
+      String? lastName,
+      String? phone,
+      List<dynamic>? personalityTypes,
+      List<String>? propertyTypes,
+      int? dateOfBirth}) async {
+    String url = "$_serverName/api/user/updateaccount";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({
+            "gender": gender,
+            "primaryLanguage": primaryLanguage,
+            "maritalStatus": maritalStatus,
+            "preferredStates": preferredStates,
+            "religion": religion,
+            "hasPets": hasPets,
+            "email": email,
+            "firstName": firstName,
+            "investmentExperience": investmentExperience,
+            "incomeRange": incomeRange,
+            "primaryGoals": primaryGoals,
+            "lastName": lastName,
+            "phone": phone,
+            "personalityTypes": personalityTypes,
+            "propertyTypes": propertyTypes,
+            "dateOfBirth": dateOfBirth,
+          }));
+
+      // _phoneFor2fa = phone;
+      final responseData = json.decode(response.body)["data"];
+      // print(responseData);
+
+      _email = responseData['email'].toString();
+      _firstName = responseData["firstName"].toString();
+      _lastName = responseData["lastName"].toString();
+      // _token = extractedUserData['token'] as String;
+      _userId = responseData['_id'] as String;
+      // _pin = responseData['pin'] as String?;
+      // _isVerified = responseData['verified'] as bool;
+      // _isVerified = responseData['verified'] as bool;
+      _profilepic = responseData["avatar"] as String?;
+      _phoneFor2fa = responseData["phone"] as String?;
+      // _twofaenabled = responseData["twofaenabled"] as bool?;
+      // _requirestwofa = responseData["requirestwofa"] as bool?;
+      // _emailnotify = responseData["emailnotify"] as bool?;
+      // _pushnotify = responseData["pushnotify"] as bool?;
+      // _countrystring = responseData["country"] as String?;
+      _gender = responseData["gender"] as String?;
+      _primaryLanguage = responseData["primaryLanguage"] as String?;
+      _investmentExperience = responseData["investmentExperience"] as String?;
+      _incomeRange = responseData["incomeRange"] as String?;
+      _maritalStatus = responseData["maritalStatus"] as String?;
+      _religion = responseData["religion"] as String?;
+      _hasPets = responseData["hasPets"] as bool?;
+      _personalityTypes = responseData["personalityTypes"] as List<dynamic>?;
+      _primaryGoals = responseData["primaryGoals"] as List<dynamic>?;
+      _preferredStates = responseData["preferredStates"] as List<dynamic>?;
+      _propertyTypes = responseData["propertyTypes"] as List<dynamic>?;
+      _dateOfBirth = responseData["dateOfBirth"] as int?;
+
+      // _isDocuVerified = responseData["isdocuverified"] as bool;
+      // _profileSurveyShown = responseData["profileSurveyShown"] as bool?;
+      notifyListeners();
+      // _twofaenabled = true;
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> disableTwofaphone() async {
+    String url = "$_serverName/api/user/disabletwofaphone";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json", 'x-auth-token': token},
+          body: json.encode({}));
+
+      // _phoneFor2fa = phone;
+      final responseData = json.decode(response.body);
+
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      _twofaenabled = false;
+
+      notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
     }
   }
 
@@ -486,6 +860,13 @@ class Auth with ChangeNotifier {
 
       _stateList = states;
       _dynamicStateList = states;
+
+      for (int i = 0; i < states.length; i++) {
+        _stateListString.add(states[i].toString());
+        _dynamicStateListString.add(states[i].toString());
+      }
+      // _stateListString = responseData["states"] as List<String>;
+      // _dynamicStateListString = responseData["states"] as List<String>;
       _selectedState = "";
       notifyListeners();
     } catch (e) {
@@ -673,7 +1054,25 @@ class Auth with ChangeNotifier {
       _pin = responseData['pin'] as String?;
       _isVerified = responseData['verified'] as bool;
       _isVerified = responseData['verified'] as bool;
-      _profilepic = responseData["avatar"] as String;
+      _profilepic = responseData["avatar"] as String?;
+      _phoneFor2fa = responseData["phone"] as String?;
+      _twofaenabled = responseData["twofaenabled"] as bool?;
+      _requirestwofa = responseData["requirestwofa"] as bool?;
+      _emailnotify = responseData["emailnotify"] as bool?;
+      _pushnotify = responseData["pushnotify"] as bool?;
+      _countrystring = responseData["country"] as String?;
+      _gender = responseData["gender"] as String?;
+      _investmentExperience = responseData["investmentExperience"] as String?;
+      _incomeRange = responseData["incomeRange"] as String?;
+      _primaryLanguage = responseData["primaryLanguage"] as String?;
+      _preferredStates = responseData["preferredStates"] as List<dynamic>?;
+      _primaryGoals = responseData["primaryGoals"] as List<dynamic>?;
+      _maritalStatus = responseData["maritalStatus"] as String?;
+      _religion = responseData["religion"] as String?;
+      _hasPets = responseData["hasPets"] as bool?;
+      _personalityTypes = responseData["personalityTypes"] as List<dynamic>?;
+      _propertyTypes = responseData["propertyTypes"] as List<dynamic>?;
+      _dateOfBirth = responseData["dateOfBirth"] as int?;
 
       _isDocuVerified = responseData["isdocuverified"] as bool;
       _profileSurveyShown = responseData["profileSurveyShown"] as bool?;
@@ -710,6 +1109,8 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    final token = await gettoken();
+
     _token = null;
     _userId = null;
     //  _userId =;
@@ -734,6 +1135,22 @@ class Auth with ChangeNotifier {
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.remove('userData');
+
+    String url = "$_serverName/api/user/logout";
+    try {
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {'x-auth-token': token, "Content-Type": "application/json"},
+          body: json.encode({}));
+
+      final responseData = json.decode(response.body);
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      throw (e);
+    }
     // prefs.clear();
   }
 
@@ -752,6 +1169,52 @@ class Auth with ChangeNotifier {
       if (hasBadRequestError(response.body)) {
         throw (json.decode(response.body)["message"]);
       }
+    } catch (e) {
+      throw (e);
+    }
+  }
+
+  Future<void> pushnotify(bool status) async {
+    String url = "$_serverName/api/user/pushnotify";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {'x-auth-token': token, "Content-Type": "application/json"},
+          body: json.encode({}));
+
+      final responseData = json.decode(response.body);
+
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+
+      _pushnotify = status;
+    } catch (e) {
+      throw (e);
+    }
+  }
+
+  Future<void> emailnotify(bool status) async {
+    String url = "$_serverName/api/user/emailnotify";
+    try {
+      final token = await gettoken();
+
+      // print(token);
+      final response = await http.post(Uri.parse(url),
+          headers: {'x-auth-token': token, "Content-Type": "application/json"},
+          body: json.encode({}));
+
+      final responseData = json.decode(response.body);
+
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+
+      _emailnotify = status;
     } catch (e) {
       throw (e);
     }

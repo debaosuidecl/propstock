@@ -6,6 +6,8 @@ import 'package:propstock/screens/enable_biometrics.dart';
 import 'package:propstock/screens/intro_survey_page.dart';
 import 'package:propstock/screens/onboarding.dart';
 import 'package:propstock/providers/auth.dart';
+import 'package:propstock/screens/security/verifyPhone.dart';
+import 'package:propstock/screens/security/verifyPhoneFromSignIn.dart';
 import 'package:propstock/screens/set_pin.dart';
 import 'package:propstock/utils_general.dart';
 import 'package:provider/provider.dart';
@@ -83,6 +85,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
         print("pushing to code verify");
         Navigator.of(context).push(
           MaterialPageRoute(builder: (context) => EmailCodeVerify()),
+        );
+      } else if (Provider.of<Auth>(context, listen: false).isVerified &&
+          Provider.of<Auth>(context, listen: false).isAuth &&
+          Provider.of<Auth>(context, listen: false).requirestwofa == true) {
+        // String? phone = Provider.of<Auth>(context, listen: false).phone;
+        print("pushing to code verify");
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => VerifyPhoneFromSignIn()),
         );
       } else if (Provider.of<Auth>(context, listen: false).isVerified &&
           Provider.of<Auth>(context, listen: false).isAuth &&

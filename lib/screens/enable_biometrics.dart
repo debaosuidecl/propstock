@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:propstock/providers/auth.dart';
+import 'package:propstock/screens/dashboard.dart';
 import 'package:propstock/screens/set_pin.dart';
+import 'package:propstock/utils/showErrorDialog.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -45,9 +49,15 @@ class _EnableBiometricsState extends State<EnableBiometrics> {
                   onTap: () async {
                     final prefs = await SharedPreferences.getInstance();
                     // final enabledBio = prefs.containsKey('enabled_biometrics');
-                    prefs.setString("enabled_biometrics", "true");
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => SetPin()));
+                    prefs.setString("enabled_biometrics", "skip");
+
+                    if (Provider.of<Auth>(context, listen: false).pin == null) {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => SetPin()));
+                    } else {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) => Dashboard()));
+                    }
                   },
                   child: Text("skip", style: TextStyle(color: Colors.blue))),
             )
@@ -157,6 +167,10 @@ class _EnableBiometricsState extends State<EnableBiometrics> {
       }
     } on PlatformException catch (e) {
       print(e);
+
+      showErrorDialog(
+          "Biometrics is not available for your device. please set that up before trying to enable",
+          context);
     }
   }
 }

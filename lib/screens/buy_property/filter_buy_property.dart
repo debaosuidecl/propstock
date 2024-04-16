@@ -567,6 +567,7 @@ class _FilterBuyPropertyState extends State<FilterBuyProperty> {
                             values.start,
                             bedNumber,
                             bathNumber,
+                            // values
                           );
 
                           Navigator.pop(context);

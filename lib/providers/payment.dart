@@ -185,6 +185,32 @@ class PaymentProvider with ChangeNotifier {
     }
   }
 
+  Future<dynamic> deleteCard(CardModel card) async {
+    String url = "$_serverName/api/payments/cards/deletecard/${card.id}";
+    try {
+      final token = await gettoken();
+      //  final secretKey = Secre/.fromUtf8('your_secret_key');
+
+      var response = await http.post(
+        Uri.parse(url),
+        body: json.encode({}),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      final responseData = json.decode(response.body)["data"] as String;
+
+      print(responseData);
+      return responseData;
+      // notifyListeners();
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<dynamic> chargeAlreadyKnownCard(
       CardModel? card, int amount, pin) async {
     String url =
@@ -320,13 +346,14 @@ class PaymentProvider with ChangeNotifier {
         dynamic cardItem = responseData[i];
 
         CardModel card = CardModel(
-          last4digits: cardItem["last_4_digits"].toString(),
-          token: cardItem['token'].toString(),
-          bank: cardItem['bank'].toString(),
-          type: cardItem['type'].toString(),
-          isDefault: cardItem['isDefault'] as bool,
-          id: cardItem["_id"].toString(),
-        );
+            last4digits: cardItem["last_4_digits"].toString(),
+            token: cardItem['token'].toString(),
+            bank: cardItem['bank'].toString(),
+            type: cardItem['type'].toString(),
+            isDefault: cardItem['isDefault'] as bool,
+            id: cardItem["_id"].toString(),
+            expiry:
+                "${cardItem["expiry_month"].toString()}/${cardItem["expiry_year"].toString().replaceFirst("20", "")}");
 
         cards.add(card);
       }

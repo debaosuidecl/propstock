@@ -37,10 +37,11 @@ class _BuyPropertyDetailAboutState extends State<BuyPropertyDetailAbout> {
         SizedBox(
           height: 10,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
           children: [
             Container(
+              margin: EdgeInsets.symmetric(vertical: 10),
               padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
                   color: Color(0xffCBDFF7),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:propstock/models/user.dart';
+import 'package:propstock/screens/home/profile.dart';
 import 'package:propstock/screens/notifications/notifications.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -21,13 +22,21 @@ class HomeHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              height: 48,
-              width: 48,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xffeeeeee),
-              ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, Profile.id);
+              },
+              child: Container(
+                  height: 48,
+                  width: 48,
+                  clipBehavior: Clip.hardEdge,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xffeeeeee),
+                  ),
+                  child: Image.network(
+                    "${_user?.avatar}",
+                  )),
             ),
             SizedBox(
               width: 10,

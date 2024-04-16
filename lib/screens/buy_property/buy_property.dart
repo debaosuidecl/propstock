@@ -194,6 +194,8 @@ class _BuyPropertyState extends State<BuyProperty> {
                             .horizontal, // Set the scroll direction to horizontal
 
                         children: _fProp.map((filterItem) {
+                          print("filter item");
+                          print(filterItem);
                           return GestureDetector(
                             onTap: () {
                               // setState(() {
@@ -218,13 +220,19 @@ class _BuyPropertyState extends State<BuyProperty> {
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    filterItem,
-                                    style: const TextStyle(
-                                      color: Color(0xff5E6D85),
-                                      fontSize: 14,
-                                      fontFamily: "Inter",
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 2),
+                                    child: Text(
+                                      filterItem.isNotEmpty
+                                          ? filterItem
+                                          : "Clear Filter",
+                                      style: const TextStyle(
+                                        color: Color(0xff5E6D85),
+                                        fontSize: 14,
+                                        fontFamily: "Inter",
+                                      ),
                                     ),
                                   ),
                                   GestureDetector(

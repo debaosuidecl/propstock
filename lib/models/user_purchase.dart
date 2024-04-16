@@ -11,6 +11,7 @@ class UserPurchase {
   List<User> coBuyers;
   int quantity;
   double pricePerUnitAtPurchase;
+  int? createdAt;
   // double amountWithdrawn;
 
   UserPurchase({
@@ -23,6 +24,7 @@ class UserPurchase {
     required this.quantity,
     required this.pricePerUnitAtPurchase,
     required this.id,
+    this.createdAt,
     // required this.amountWithdrawn,g
   });
 }

@@ -122,10 +122,10 @@ class HomeCard extends StatelessWidget {
 
                 Row(
                   children: [
-                    SvgPicture.asset("images/upd.svg"),
-                    SizedBox(
-                      width: 15,
-                    ),
+                    // SvgPicture.asset("images/upd.svg"),
+                    // SizedBox(
+                    //   width: 15,
+                    // ),
                     Text("${diff.toStringAsFixed(2)}%",
                         // overflow: TextOverflow.ellipsis,
                         style: TextStyle(

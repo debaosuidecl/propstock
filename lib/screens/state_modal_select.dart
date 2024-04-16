@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:propstock/models/country.dart';
+// import 'package:propstock/models/country.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
-import 'dart:convert';
+// import 'dart:convert';
 
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class StateModalSelect extends StatefulWidget {
@@ -22,7 +22,7 @@ class _StateModalSelectState extends State<StateModalSelect> {
   List<dynamic> _constantStates = [];
   String _selectedState = "";
   // bool _loading = true;
-  String _selectedCountry = "";
+  // String _selectedCountry = "";
   final TextEditingController _textEditingController = TextEditingController();
   @override
   void initState() {

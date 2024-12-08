@@ -47,6 +47,22 @@ class _ProfileState extends State<Profile> {
                   width: double.infinity,
                   height: 184,
                   decoration: BoxDecoration(color: Color(0xffCBDFF7)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios,
+                            color: MyColors.primaryDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 Positioned(
                   bottom: -50,

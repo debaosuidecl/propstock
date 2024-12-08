@@ -15,6 +15,7 @@ import 'package:propstock/screens/investments/maturity_date_on_investment.dart';
 import 'package:propstock/screens/property_detail/property_detail.about.dart';
 import 'package:propstock/screens/property_detail/property_detail.location.dart';
 import 'package:propstock/screens/verify_account/verify_account.dart';
+import 'package:propstock/screens/verify_identity/verify_identity.dart';
 import 'package:propstock/screens/withdrawals/amount_to_withdraw.dart';
 import 'package:propstock/screens/withdrawals/amount_to_withdraw_b.dart';
 import 'package:propstock/screens/withdrawals/pin_to_withdraw_to_bank.dart';
@@ -124,7 +125,8 @@ class _InvestmentDetailsOverviewState extends State<InvestmentDetailsOverview> {
 
                     final bool isDocuverified =
                         Provider.of<Auth>(context, listen: false)
-                            .isDocuVerified;
+                                .isDocuVerified ==
+                            true;
 
                     if (!isDocuverified) {
                       Navigator.pop(context);
@@ -196,7 +198,7 @@ class _InvestmentDetailsOverviewState extends State<InvestmentDetailsOverview> {
                   onPressed: () {
                     Navigator.pushNamed(
                       context,
-                      VerifyAccount.id,
+                      VerifyIdentity.id,
                     );
                   }),
             )

@@ -145,7 +145,7 @@ class _SignInWithPasswordState extends State<SignInWithPassword> {
                             },
                             child: obscuringText
                                 ? Icon(Icons.remove_red_eye)
-                                : Icon(Icons.hide_source_sharp),
+                                : Icon(Icons.remove_red_eye_outlined),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 15),

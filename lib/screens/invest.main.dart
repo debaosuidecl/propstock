@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/providers/property.dart';
+import 'package:propstock/screens/dashboard.dart';
 import 'package:propstock/screens/filter_dashboard.dart';
 import 'package:propstock/screens/invest.subscreen.dart';
 import 'package:propstock/screens/investment_portfolio/investment_portolio_sub_screen.dart';
@@ -12,6 +13,7 @@ import 'package:provider/provider.dart';
 
 class Invest extends StatefulWidget {
   const Invest({super.key});
+  static const id = "invest_main";
 
   @override
   State<Invest> createState() => _InvestState();
@@ -23,6 +25,27 @@ class _InvestState extends State<Invest> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () {
+            bool isLastPage = !Navigator.canPop(context);
+            print("is last page: $isLastPage");
+            if (isLastPage) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, Dashboard.id, (route) => false);
+            } else {
+              Navigator.pop(context);
+            }
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            color: Colors.black,
+          ),
+        ),
+        // title: Text(""),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -39,7 +62,7 @@ class _InvestState extends State<Invest> {
                         ]),
               padding: const EdgeInsets.symmetric(
                 // horizontal: 8.0,
-                vertical: 20.0,
+                vertical: 10.0,
               ),
               // width: MediaQuery.of(context).size.w,
               child: Column(
@@ -89,79 +112,6 @@ class _InvestState extends State<Invest> {
                       ]),
                   const SizedBox(
                     height: 20,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _pageIndex = 0;
-                          });
-                        },
-                        child: Container(
-                            width: MediaQuery.of(context).size.width / 2,
-                            // color: Colors.green,
-                            child: Text(
-                              "Invest",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: "Inter",
-                                fontSize: 18,
-                                fontWeight: _pageIndex == 0
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                                color: _pageIndex == 0
-                                    ? const Color(0xff2286FE)
-                                    : const Color(0xff5e6d85),
-                              ),
-                            )),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _pageIndex = 1;
-                          });
-                        },
-                        child: Container(
-                            width: MediaQuery.of(context).size.width / 2,
-                            // color: Colors.green,
-                            child: Text(
-                              "Portfolio",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: "Inter",
-                                fontSize: 18,
-                                fontWeight: _pageIndex == 1
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                                color: _pageIndex == 1
-                                    ? const Color(0xff2286FE)
-                                    : const Color(0xff5e6d85),
-                              ),
-                            )),
-                      ),
-                      // Container(child: Text("Portfolio")),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              color: Color(0xffEBEDF0),
-              height: 2,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    height: 2,
-                    width: MediaQuery.of(context).size.width / 10,
-                    color: _pageIndex == 0 ? Colors.blue : Color(0xffebedf0),
-                  ),
-                  Container(
-                    height: 12,
-                    width: MediaQuery.of(context).size.width / 10,
-                    color: _pageIndex == 1 ? Colors.blue : Color(0xffebedf0),
                   ),
                 ],
               ),

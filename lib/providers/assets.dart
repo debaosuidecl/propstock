@@ -12,15 +12,31 @@ import 'package:propstock/models/user_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AssetsProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
+  double _amountToBePaid = 0;
+  bool isFinalPayment = false;
+  double get amountToBePaid {
+    return _amountToBePaid;
+  }
+
+  void setAmountToBePaid(double amt) {
+    _amountToBePaid = amt;
+    notifyListeners();
+  }
+
+  void setIsFinalPayment(bool opt) {
+    isFinalPayment = opt;
+    notifyListeners();
+  }
 
   Property formatProperty(dynamic propItem) {
+    // printlargetring(propItem.toString());
     return Property(
       id: propItem["_id"].toString(),
       about: propItem["about"].toString(),
       name: propItem["name"].toString(),
-      propImage: propItem["propImage"].toString(),
-      imagesList: propItem["imagesList"] as List<dynamic>?,
+      propImage: propItem["imagesList"]![0].toString(),
+      imagesList: propItem["imagesList"] as List<dynamic>,
       location: propItem["location"].toString(),
       pricePerUnit: propItem["pricePerUnit"].toDouble(),
       volatility: propItem["volatility"].toString(),
@@ -28,29 +44,105 @@ class AssetsProvider with ChangeNotifier {
       amountFunded: propItem["amountFunded"].toDouble(),
       bedNumber: propItem["bedNumber"].toInt(),
       bathNumber: propItem["bathNumber"].toInt(),
-      landSize: propItem["landSize"],
-      facilities: propItem['facilities'] as List<dynamic>?,
-      availability: propItem['availability'].toString(),
-      furniture: propItem['furniture'].toString(),
-      longitude: propItem["longitude"].toDouble(),
-      availableUnit: propItem["availableUnit"].toInt(),
-      totalUnits: propItem["totalUnits"].toInt(),
-      leverage: propItem["leverage"].toInt(),
-      minHoldingTime: propItem["minHoldingTime"].toInt(),
+      // longitude: propItem["longitude"].toDouble(),
+      availableUnit: 1000,
+      totalUnits: 1000,
+      // leverage: propItem["leverage"].toInt(),
+      // minHoldingTime: propItem["minHoldingTime"].toInt(),
       certificateOfOccupancy: propItem["certificateOfOccupancy"].toString(),
       governorConsent: propItem["governorConsent"].toString(),
       probateLetterOfAdministration:
           propItem["probateLetterOfAdministration"].toString(),
       excisionGazette: propItem["excisionGazette"].toString(),
-      tags: propItem["tags"] as List<dynamic>?,
-      latitude: propItem["latitude"].toDouble(),
-      plotNumber: propItem["plotNumber"].toInt(),
+      tags: propItem["tags"] as List<dynamic>,
+      // latitude: propItem["latitude"].toDouble(),
+      // plotNumber: propItem["plotNumber"].toInt(),
       totalAmountToFund: propItem["totalAmountToFund"].toDouble(),
       propertyType: propItem["propertyType"].toString(),
       investmentType: propItem["investmentType"].toString(),
-      maturitydate: propItem["maturitydate"].toInt(),
+      // maturitydate: propItem["maturitydate"].toInt(),
+      maturitydate: 0,
       status: propItem["status"].toString(),
     );
+  }
+
+  Future<dynamic> findCoInvestPercentage(
+      User coinvestor, String? investmentId) async {
+    String url =
+        "$_serverName/api/investments/findcoinvestorpercentage/$investmentId/${coinvestor.id}";
+
+    try {
+      final token = await gettoken();
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      final responseData = json.decode(response.body)["data"] as dynamic;
+
+      print(responseData);
+
+      return responseData['percentage'];
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getifuserisfinalusertopay(String? investmentId) async {
+    String url =
+        "$_serverName/api/investments/getifuserisfinalusertopay/$investmentId";
+
+    try {
+      final token = await gettoken();
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      final responseData = json.decode(response.body)["data"] as dynamic;
+
+      print("is final payment ${responseData['isfinalpayment']}");
+
+      return responseData['isfinalpayment'];
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<dynamic> fetchAmountPaid(String? investmentId) async {
+    String url = "$_serverName/api/investments/amountpaid/$investmentId";
+
+    try {
+      final token = await gettoken();
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      final responseData =
+          json.decode(response.body)["data"].toDouble() as double;
+
+      print(responseData);
+
+      return responseData;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
   }
 
   Future<dynamic> fetchAssets(
@@ -108,12 +200,21 @@ class AssetsProvider with ChangeNotifier {
             property: formatProperty(
               userAssetItem["property"],
             ),
-            isCoBuyer: userAssetItem["isCoBuyer"] == "true",
+            investor: User(
+              firstName: userAssetItem["investor"]['firstName'].toString(),
+              lastName: userAssetItem["investor"]['lastName'],
+              userName: userAssetItem["investor"]['email'],
+              avatar: userAssetItem["investor"]['avatar'],
+              id: userAssetItem["investor"]['_id'],
+            ),
+            isCoBuyer: userAssetItem["isCoBuyer"] == true,
             isInitiatorOfCoBuying:
                 userAssetItem['isInitiatorOfCoBuying'] == "true",
             propertyType: userAssetItem["propertyType"].toString(),
             coBuyAmount: userAssetItem["coBuyAmount"].toDouble(),
             coBuyers: coBuyers,
+            complete: userAssetItem["complete"],
+
             // maturityDate: userAssetItem["maturityDate"].toInt(),
             quantity: userAssetItem["quantity"].toInt(),
             createdAt: userAssetItem["createdAt"].toInt(),
@@ -150,6 +251,9 @@ class AssetsProvider with ChangeNotifier {
 
           print("even got here after the loop $coInvestors");
 
+          print("user asset item : ${userAssetItem["isCoInvestor"]}");
+          print("user asset amount : ${userAssetItem["coInvestAmount"]}");
+
           // if (i == 0) {
           //   _currency = userAssetItem["property"]['currency'];
           // }
@@ -159,7 +263,14 @@ class AssetsProvider with ChangeNotifier {
             property: formatProperty(
               userAssetItem["property"],
             ),
-            isCoInvestor: userAssetItem["isCoInvestor"] == "true",
+            investor: User(
+              firstName: userAssetItem["investor"]['firstName'].toString(),
+              lastName: userAssetItem["investor"]['lastName'],
+              userName: userAssetItem["investor"]['email'],
+              avatar: userAssetItem["investor"]['avatar'],
+              id: userAssetItem["investor"]['_id'],
+            ),
+            isCoInvestor: userAssetItem["isCoInvestor"] == true,
             isInitiatorOfCoInvestment:
                 userAssetItem['isInitiatorOfCoInvestment'] == "true",
             propertyType: userAssetItem["propertyType"].toString(),
@@ -168,6 +279,7 @@ class AssetsProvider with ChangeNotifier {
             maturityDate: userAssetItem["maturityDate"].toInt(),
             createdAt: userAssetItem["createdAt"].toInt(),
             quantity: userAssetItem["quantity"].toInt(),
+            complete: userAssetItem["complete"],
             pricePerUnitAtPurchase:
                 userAssetItem["pricePerUnitAtPurchase"].toDouble(),
           );

@@ -51,7 +51,8 @@ class _EnableBiometricsState extends State<EnableBiometrics> {
                     // final enabledBio = prefs.containsKey('enabled_biometrics');
                     prefs.setString("enabled_biometrics", "skip");
 
-                    if (Provider.of<Auth>(context, listen: false).pin == null) {
+                    if (Provider.of<Auth>(context, listen: false).pin == null ||
+                        Provider.of<Auth>(context, listen: false).pin == "") {
                       Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) => SetPin()));
                     } else {

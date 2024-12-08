@@ -7,6 +7,7 @@ import 'package:propstock/models/user.dart';
 import 'package:propstock/providers/payment.dart';
 import 'package:propstock/providers/property.dart';
 import 'package:propstock/screens/invest/co_invest_modal.dart';
+import 'package:propstock/screens/investments/successInvest.dart';
 // import 'package:propstock/screens/invest/send_investment_as_gifts.dart';
 import 'package:propstock/screens/payments/display_wallet_balance.dart';
 import 'package:propstock/screens/payments/enter_pin_pre_purchase.dart';
@@ -63,7 +64,8 @@ class _CoInvestFinalPageState extends State<CoInvestFinalPage> {
       type: "coinvest",
     ),
     EnterPinPrePurchase(type: "invest"),
-    const DisplayWalletBalance()
+    const DisplayWalletBalance(),
+    SuccesInvest(),
   ];
 
   Future<void> _showBottomSheet(BuildContext context) async {
@@ -86,6 +88,11 @@ class _CoInvestFinalPageState extends State<CoInvestFinalPage> {
       if (res == "paystack" || res == "wallet") {
         setState(() {
           _payment_page = 2;
+        });
+      } else if (res == "success") {
+        print(2);
+        setState(() {
+          _payment_page = 4;
         });
       } else if (res == "wallet_pre") {
         print(2);

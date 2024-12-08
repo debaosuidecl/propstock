@@ -126,6 +126,20 @@ class _WalletPageState extends State<WalletPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: !Navigator.canPop(context)
+          ? null
+          : AppBar(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: MyColors.primaryDark,
+                  )),
+            ),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(

@@ -12,14 +12,18 @@ class Property {
   String? availability;
   List<dynamic>? facilities;
   String investmentType;
+  String? housename;
+  String? floor;
   String status;
   int? bedNumber;
   int? bathNumber;
   int? plotNumber;
   int? landSize;
   List<dynamic>? imagesList;
+  String? country;
   String? about;
   double? latitude;
+  bool? published;
   double? longitude;
   int? availableUnit;
   int? totalUnits;
@@ -31,9 +35,18 @@ class Property {
   String? governorConsent;
   String? probateLetterOfAdministration;
   String? excisionGazette;
+  String? duplexType;
   int maturitydate;
+  List<dynamic>? titledocuments;
+  List<dynamic>? docupaths;
   Property({
     required this.name,
+    this.duplexType,
+    this.country,
+    this.published,
+    this.housename,
+    this.titledocuments,
+    this.docupaths,
     required this.id,
     required this.currency,
     required this.propImage,
@@ -46,6 +59,7 @@ class Property {
     required this.status,
     this.imagesList,
     this.furniture,
+    this.floor,
     this.availability,
     this.landSize,
     this.facilities,

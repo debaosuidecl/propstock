@@ -6,6 +6,8 @@
   <string>en</string>
   <key>CFBundleExecutable</key>
   <string>App</string>
+  <key>io.flutter.embedded_views_preview</key>
+	<string>YES</string>
   <key>CFBundleIdentifier</key>
   <string>io.flutter.flutter.app</string>
   <key>CFBundleInfoDictionaryVersion</key>

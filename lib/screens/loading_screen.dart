@@ -107,16 +107,20 @@ class _LoadingScreenState extends State<LoadingScreen> {
         // set pin page
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => SetPin()));
-      } else if (Provider.of<Auth>(context, listen: false).isVerified &&
-          Provider.of<Auth>(context, listen: false).isAuth &&
-          enabledBio &&
-          Provider.of<Auth>(context, listen: false).pin != "" &&
-          Provider.of<Auth>(context, listen: false).profileSurveyShown !=
-              true) {
-        // set pin page
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (context) => IntroSurveyPage()));
-      } else if (Provider.of<Auth>(context, listen: false).isAuth &&
+      }
+
+      // else if (Provider.of<Auth>(context, listen: false).isVerified &&
+      //     Provider.of<Auth>(context, listen: false).isAuth &&
+      //     enabledBio &&
+      //     Provider.of<Auth>(context, listen: false).pin != "" &&
+      //     Provider.of<Auth>(context, listen: false).profileSurveyShown !=
+      //         true) {
+      //   // set pin page
+      //   Navigator.of(context)
+      //       .push(MaterialPageRoute(builder: (context) => IntroSurveyPage()));
+      // }
+
+      else if (Provider.of<Auth>(context, listen: false).isAuth &&
           Provider.of<Auth>(context, listen: false).isVerified &&
           enabledBio &&
           Provider.of<Auth>(context, listen: false).pin != "") {
@@ -133,13 +137,13 @@ class _LoadingScreenState extends State<LoadingScreen> {
         final result = await Connectivity().checkConnectivity();
         final hasInternet = showConnectivitySnackBar(result);
 
-        if (hasInternet) {
-          Navigator.pushNamedAndRemoveUntil(
-            context,
-            OnBoarding.id,
-            (route) => false,
-          );
-        }
+        // if (hasInternet) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          OnBoarding.id,
+          (route) => false,
+        );
+        // }
       }
     } catch (e) {
       print(e);

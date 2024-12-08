@@ -20,7 +20,7 @@ import 'package:propstock/screens/assets/assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PortfolioProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
 
   double _userBalance = 0;
   String _balanceCurrency = "";
@@ -46,6 +46,43 @@ class PortfolioProvider with ChangeNotifier {
   Future<dynamic> fetchUserWalletData(String searchcriteria) async {
     String url =
         "$_serverName/api/payments/wallet-data?searchcriteria=$searchcriteria";
+    try {
+      final token = await gettoken();
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json", "x-auth-token": token},
+      );
+
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+      final responseData = json.decode(response.body)["data"] as List<dynamic>;
+      final balanceData = json.decode(response.body)["userWallet"] as dynamic;
+      List<FlSpot> priceWalletData = [];
+
+      for (int i = 0; i < responseData.length; i++) {
+        final dynamic walletdataitem = responseData[i];
+        double price = walletdataitem["balance"].toDouble();
+        double date = walletdataitem["createdAt"].toDouble();
+        priceWalletData.add(FlSpot(date, price));
+      }
+
+      _userBalance = balanceData["balance"].toDouble();
+      _balanceCurrency = balanceData["currency"].toString();
+      print(responseData);
+      print("success");
+
+      return priceWalletData;
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
+  Future<dynamic> fetchUserPortfolioData(String searchcriteria) async {
+    String url =
+        "$_serverName/api/payments/portfolio-data?searchcriteria=$searchcriteria";
     try {
       final token = await gettoken();
 
@@ -368,15 +405,15 @@ class PortfolioProvider with ChangeNotifier {
           cardColor: Color(0xffF55D3E),
         ),
       );
-      listOfAppHomeSchema.add(
-        AppHomeSchema(
-          title: "Portfolio",
-          amount: responseData["totalPortfolio"].toDouble(),
-          currency: responseData["currency"],
-          diff: responseData["totalPortfoliodiff"].toDouble(),
-          cardColor: Color(0xff1A936F),
-        ),
-      );
+      // listOfAppHomeSchema.add(
+      //   AppHomeSchema(
+      //     title: "Portfolio",
+      //     amount: responseData["totalPortfolio"].toDouble(),
+      //     currency: responseData["currency"],
+      //     diff: responseData["totalPortfoliodiff"].toDouble(),
+      //     cardColor: Color(0xff1A936F),
+      //   ),
+      // );
 
       return listOfAppHomeSchema;
     } catch (e) {

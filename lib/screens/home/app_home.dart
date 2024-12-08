@@ -7,8 +7,19 @@ import 'package:propstock/models/wallet.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/providers/portfolio.dart';
 import 'package:propstock/providers/property.dart';
+import 'package:propstock/screens/affiliate/affiliate.dart';
+import 'package:propstock/screens/affiliate/listing.dart';
 import 'package:propstock/screens/friends/myfriends.dart';
+import 'package:propstock/screens/home/CardHome.dart';
 import 'package:propstock/screens/home/home_card.dart';
+import 'package:propstock/screens/home/setup_completion.dart';
+import 'package:propstock/screens/invest.main.dart';
+import 'package:propstock/screens/invest.subscreen.dart';
+import 'package:propstock/screens/investment_portfolio/investment_portolio_sub_screen.dart';
+import 'package:propstock/screens/investments/investment_details.dart';
+import 'package:propstock/screens/marketplace/market_place.dart';
+import 'package:propstock/screens/portfolio_cover.dart';
+import 'package:propstock/screens/wallet/wallet.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:propstock/widgets/homeheader.dart';
 import 'package:propstock/widgets/loading_bar_pure.dart';
@@ -29,6 +40,8 @@ class _AppHomeState extends State<AppHome> {
   Wallet networth = Wallet(amount: 10000, currency: "NGN");
   List<AppHomeSchema> listOfSchema = [];
   double completefraction = .75;
+  bool loading = true;
+  bool dontshowcompletesetup = false;
   List<User> _friends = [];
   final plistitems = [
     {
@@ -99,20 +112,44 @@ class _AppHomeState extends State<AppHome> {
       List<AppHomeSchema> _listOfSchema =
           await Provider.of<PortfolioProvider>(context, listen: false)
               .fetchAppHomeSchema();
-      List<User> _listOfFriends =
-          await Provider.of<Auth>(context, listen: false)
-              .getUserFriends(1, 5, query: "");
+      // List<User> _listOfFriends =
+      //     await Provider.of<Auth>(context, listen: false)
+      //         .getUserFriends(1, 5, query: "");
 
-      Provider.of<PropertyProvider>(context, listen: false)
-          .setFriendAsGift(null);
+      // Provider.of<PropertyProvider>(context, listen: false)
+      //     .setFriendAsGift(null);
 
-      print(_listOfFriends.length);
+      // print(_listOfFriends.length);
+
+      await Provider.of<Auth>(context, listen: false).tryAutoLogin();
+      double newfraction = 1;
+      double totalComplete = 4;
+      if (Provider.of<Auth>(context, listen: false).hasToppedUpWallet == true) {
+        newfraction = newfraction + 1;
+      }
+      if (Provider.of<Auth>(context, listen: false).isDocuVerified == true) {
+        newfraction = newfraction + 1;
+      }
+      if (Provider.of<Auth>(context, listen: false).basicInformationComplete ==
+          true) {
+        newfraction = newfraction + 1;
+      }
+
+      // if () {
+      //   newfraction = newfraction + 1;
+      // }
       setState(() {
         listOfSchema = _listOfSchema;
-        _friends = _listOfFriends;
+        // _friends = _listOfFriends;
+        completefraction = newfraction / totalComplete;
+        dontshowcompletesetup = newfraction / totalComplete >= 1;
+        loading = false;
       });
     } catch (e) {
       print(e);
+      setState(() {
+        loading = false;
+      });
       showErrorDialog(
           "An error occured while fetching home page data", context);
     }
@@ -139,382 +176,568 @@ class _AppHomeState extends State<AppHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(children: [
-            SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: HomeHeader(user: _user),
-            ),
-            Container(
-              padding: EdgeInsets.zero,
-              height: 220,
-              child: PageView.builder(
-                controller: _pageControllerCard,
-                itemCount: listOfSchema.length,
-                itemBuilder: (context, index) {
-                  AppHomeSchema single = listOfSchema[index];
-                  return Padding(
-                      padding: EdgeInsets.all(7),
-                      child: HomeCard(
-                        wallet: Wallet(
-                          amount: single.amount,
-                          currency: single.currency,
-                        ),
-                        diff: single.diff,
-                        title: single.title,
-                        color: single.cardColor,
-                      ));
-                },
-                onPageChanged: (int index) {
+        child: loading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                color: MyColors.primary,
+                onRefresh: () async {
                   setState(() {
-                    currentCardIndex = index;
+                    loading = true;
                   });
+                  _initHomeState();
                 },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 6,
-                  width: 6,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: currentCardIndex == 0
-                        ? MyColors.primary
-                        : Color(0xffCBDFF7),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  height: 6,
-                  width: 6,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: currentCardIndex == 1
-                        ? MyColors.primary
-                        : Color(0xffCBDFF7),
-                  ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                Container(
-                  height: 6,
-                  width: 6,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: currentCardIndex == 2
-                        ? MyColors.primary
-                        : Color(0xffCBDFF7),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              height: 450,
-              padding: EdgeInsets.all(10),
-              child: GridView.builder(
-                physics: NeverScrollableScrollPhysics(), // Disable scrolling
-
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Number of columns in the grid
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: 4, // Number of items in the grid
-                itemBuilder: (BuildContext context, int index) {
-                  dynamic item = plistitems[index];
-                  return PSListItem(
-                    img: item["img"],
-                    title: item['title'],
-                    desc: item['desc'],
-                    actionText: item['actionText'],
-                    color: item['color'],
-                    action: item['action'],
-                  );
-                },
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Complete Set-up",
-                    style: TextStyle(
-                      color: MyColors.primaryDark,
-                      fontSize: 18,
-                      fontFamily: "Inter",
-                      fontWeight: FontWeight.w500,
+                child: SingleChildScrollView(
+                  child: Column(children: [
+                    SizedBox(
+                      height: 40,
                     ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                          "${(completefraction * 100).toStringAsFixed(2)}% complete",
-                          style: TextStyle(
-                            color: MyColors.primary,
-                            fontFamily: "Inter",
-                            fontWeight: FontWeight.w500,
-                            fontSize: 10,
-                          )),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      LoadingBarPure(
-                        fraction: completefraction,
-                        filledColor: MyColors.primary,
-                        barHeight: 5,
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "I.D Verification",
-                        style: TextStyle(
-                          color: MyColors.neutralblack,
-                          fontSize: 16,
-                          fontFamily: "Inter",
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Text(
-                          "We need to verify your identity before actions can be completed.",
-                          style: TextStyle(
-                            color: MyColors.neutral,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Inter",
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SvgPicture.asset("images/direction_right.svg")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Profile Information",
-                        style: TextStyle(
-                          color: MyColors.neutralblack,
-                          fontSize: 16,
-                          fontFamily: "Inter",
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Text(
-                          "Fill out the information form in your profile. This helps us customize your account",
-                          style: TextStyle(
-                            color: MyColors.neutral,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Inter",
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SvgPicture.asset("images/direction_right.svg")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              width: double.infinity,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Fund Wallet",
-                        style: TextStyle(
-                          color: MyColors.neutralblack,
-                          fontSize: 16,
-                          fontFamily: "Inter",
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width * .8,
-                        child: Text(
-                          "Start your real estate journey by funding your wallet",
-                          style: TextStyle(
-                            color: MyColors.neutral,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Inter",
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SvgPicture.asset("images/direction_right.svg")
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Your Friends",
-                    style: TextStyle(
-                      color: MyColors.primaryDark,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 18,
-                      fontFamily: "Inter",
+                    Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: HomeHeader(user: _user),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, MyFriends.id).then((value) {
-                        fetchFriends();
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        Text(
-                          "Friends List ",
-                          style: TextStyle(
-                            color: MyColors.primary,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            fontFamily: "Inter",
-                          ),
-                        ),
-                        SvgPicture.asset("images/direction_right_blue.svg")
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 40,
-            ),
-            Container(
-              height: 100,
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: ListView.builder(
-                  itemCount: _friends.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    User friend = _friends[index];
-                    return Row(
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                                clipBehavior: Clip.hardEdge,
-                                height: 64,
-                                width: 64,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  // color: Colors.green,
+                    Container(
+                      padding: EdgeInsets.zero,
+                      height: 220,
+                      child: PageView.builder(
+                        controller: _pageControllerCard,
+                        itemCount: listOfSchema.length,
+                        itemBuilder: (context, index) {
+                          AppHomeSchema single = listOfSchema[index];
+                          return Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 15),
+                              child: HomeCard(
+                                withdrawHandler: () {
+                                  Navigator.pushNamed(context, WalletPage.id);
+                                },
+                                wallet: Wallet(
+                                  amount: single.amount,
+                                  currency: single.currency,
                                 ),
-                                child: friend.avatar != null
-                                    ? Image.network(
-                                        "${friend.avatar}",
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Icon(
-                                        Icons.person_3_rounded,
-                                        color: Colors.grey,
-                                      )
-                                // child: ,
-                                ),
-                            Text("${friend.firstName}"),
-                            Text("${friend.lastName}"),
-                          ],
+                                diff: single.diff,
+                                title: single.title,
+                                color: single.cardColor,
+                              ));
+                        },
+                        onPageChanged: (int index) {
+                          setState(() {
+                            currentCardIndex = index;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 6,
+                          width: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: currentCardIndex == 0
+                                ? MyColors.primary
+                                : Color(0xffCBDFF7),
+                          ),
                         ),
                         SizedBox(
                           width: 10,
-                        )
+                        ),
+                        Container(
+                          height: 6,
+                          width: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: currentCardIndex == 1
+                                ? MyColors.primary
+                                : Color(0xffCBDFF7),
+                          ),
+                        ),
+                        // SizedBox(
+                        //   width: 10,
+                        // ),
+                        // Container(
+                        //   height: 6,
+                        //   width: 6,
+                        //   decoration: BoxDecoration(
+                        //     shape: BoxShape.circle,
+                        //     color: currentCardIndex == 2
+                        //         ? MyColors.primary
+                        //         : Color(0xffCBDFF7),
+                        //   ),
+                        // ),
                       ],
-                    );
-                  }),
-            ),
-            SizedBox(
-              height: 50,
-            ),
-          ]),
-        ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    if (!dontshowcompletesetup)
+                      GestureDetector(
+                        onTap: () {
+                          // Navigator.pushNamed(context, CompleteSetupHome.id);
+                        },
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Complete Set-up",
+                                    style: TextStyle(
+                                      color: MyColors.primaryDark,
+                                      fontFamily: "Inter",
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          dontshowcompletesetup = true;
+                                        });
+                                      },
+                                      child: SvgPicture.asset(
+                                          "images/close_circle_b.svg")),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                        context, CompleteSetupHome.id)
+                                    .then((res) {
+                                  _initHomeState();
+                                });
+                              },
+                              child: ListTile(
+                                title: Text(
+                                  "You are a few steps away to complete your onboarding requirements.",
+                                  style: TextStyle(
+                                    color: Color(0xff8E99AA),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                trailing:
+                                    SvgPicture.asset("images/right_dir.svg"),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                      "${(completefraction * 100).toStringAsFixed(2)}% complete",
+                                      style: TextStyle(
+                                        color: MyColors.primary,
+                                        fontFamily: "Inter",
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 10,
+                                      )),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15),
+                              child: LoadingBarPure(
+                                fraction: completefraction,
+                                filledColor: MyColors.primary,
+                                barHeight: 5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    SizedBox(
+                      height: 20,
+                    ),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, PortfolioCover.id);
+                            },
+                            child: CardHome(
+                                bg: Color(0xff0B6E38).withOpacity(.08),
+                                assetPath: "images/portfoliob.svg",
+                                headercolor: Color(0xff0B6E38),
+                                headertext: "Portfolio",
+                                desc:
+                                    "Monitor your growth since your last visit."),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, Invest.id);
+                            },
+                            child: CardHome(
+                              bg: Color(0xff9802F9).withOpacity(.05),
+                              assetPath: "images/investiconb.svg",
+                              headercolor: Color(0xff9802F9),
+                              headertext: "Invest",
+                              desc: "Access and invest in growing properties.",
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              if (Provider.of<Auth>(context, listen: false)
+                                      .exlusivityDocSigned ==
+                                  true) {
+                                Navigator.pushNamed(
+                                    context, AffiliateListing.id);
+                              } else {
+                                Navigator.pushNamed(context, AffiliatePage.id);
+                              }
+                            },
+                            child: CardHome(
+                              bg: Color(0xffFFE6E6),
+                              assetPath: "images/affiliateiconb.svg",
+                              headercolor: Color(0xffB50000),
+                              headertext: "Affiliate",
+                              desc: "Reach more prospects, and sell faster.",
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, MarketPlace.id);
+                            },
+                            child: CardHome(
+                              bg: Color(0xffF6931C).withOpacity(0.08),
+                              assetPath: "images/marketplaceb.svg",
+                              headercolor: Color(0xffF6931C),
+                              headertext: "Marketplace",
+                              desc:
+                                  "Discover, buy or sell properties, land and rentals.",
+                            ),
+                          ),
+                          // CardHome(
+                          //   bg: Color(0xff652D90).withOpacity(0.08),
+                          //   assetPath: "images/coowner1.svg",
+                          //   headercolor: Color(0xff652D90),
+                          //   headertext: "Co-Owner",
+                          //   desc: "Invite families & friends as your co-owner.",
+                          // ),
+                        ],
+                      ),
+                    )
+                    // Container(
+                    //   height: 450,
+                    //   padding: EdgeInsets.all(10),
+                    //   child: GridView.builder(
+                    //     physics: NeverScrollableScrollPhysics(), // Disable scrolling
+
+                    //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //       crossAxisCount: 2, // Number of columns in the grid
+                    //       crossAxisSpacing: 10,
+                    //       mainAxisSpacing: 10,
+                    //     ),
+                    //     itemCount: 4, // Number of items in the grid
+                    //     itemBuilder: (BuildContext context, int index) {
+                    //       dynamic item = plistitems[index];
+                    //       return PSListItem(
+                    //         img: item["img"],
+                    //         title: item['title'],
+                    //         desc: item['desc'],
+                    //         actionText: item['actionText'],
+                    //         color: item['color'],
+                    //         action: item['action'],
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 20,
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 20),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Text(
+                    //         "Complete Set-up",
+                    //         style: TextStyle(
+                    //           color: MyColors.primaryDark,
+                    //           fontSize: 18,
+                    //           fontFamily: "Inter",
+                    //           fontWeight: FontWeight.w500,
+                    //         ),
+                    //       ),
+                    //     Column(
+                    //       mainAxisAlignment: MainAxisAlignment.end,
+                    //       crossAxisAlignment: CrossAxisAlignment.end,
+                    //       children: [
+                    // Text(
+                    //     "${(completefraction * 100).toStringAsFixed(2)}% complete",
+                    //     style: TextStyle(
+                    //       color: MyColors.primary,
+                    //       fontFamily: "Inter",
+                    //       fontWeight: FontWeight.w500,
+                    //       fontSize: 10,
+                    //     )),
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
+                    // LoadingBarPure(
+                    //   fraction: completefraction,
+                    //   filledColor: MyColors.primary,
+                    //   barHeight: 5,
+                    // )
+                    //       ],
+                    //     )
+                    //   ],
+                    // ),
+                    // ),
+                    // SizedBox(
+                    //   height: 40,
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 20),
+                    //   width: double.infinity,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Column(
+                    //         mainAxisAlignment: MainAxisAlignment.start,
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text(
+                    //             "I.D Verification",
+                    //             style: TextStyle(
+                    //               color: MyColors.neutralblack,
+                    //               fontSize: 16,
+                    //               fontFamily: "Inter",
+                    //               fontWeight: FontWeight.w400,
+                    //             ),
+                    //           ),
+                    //           SizedBox(
+                    //             height: 10,
+                    //           ),
+                    //           Container(
+                    //             width: MediaQuery.of(context).size.width * .8,
+                    //             child: Text(
+                    //               "We need to verify your identity before actions can be completed.",
+                    //               style: TextStyle(
+                    //                 color: MyColors.neutral,
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w400,
+                    //                 fontFamily: "Inter",
+                    //               ),
+                    //             ),
+                    //           )
+                    //         ],
+                    //       ),
+                    //       SvgPicture.asset("images/direction_right.svg")
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 40,
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 20),
+                    //   width: double.infinity,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Column(
+                    //         mainAxisAlignment: MainAxisAlignment.start,
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text(
+                    //             "Profile Information",
+                    //             style: TextStyle(
+                    //               color: MyColors.neutralblack,
+                    //               fontSize: 16,
+                    //               fontFamily: "Inter",
+                    //               fontWeight: FontWeight.w400,
+                    //             ),
+                    //           ),
+                    //           SizedBox(
+                    //             height: 10,
+                    //           ),
+                    //           Container(
+                    //             width: MediaQuery.of(context).size.width * .8,
+                    //             child: Text(
+                    //               "Fill out the information form in your profile. This helps us customize your account",
+                    //               style: TextStyle(
+                    //                 color: MyColors.neutral,
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w400,
+                    //                 fontFamily: "Inter",
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       SvgPicture.asset("images/direction_right.svg")
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 40,
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.symmetric(horizontal: 20),
+                    //   width: double.infinity,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       Column(
+                    //         mainAxisAlignment: MainAxisAlignment.start,
+                    //         crossAxisAlignment: CrossAxisAlignment.start,
+                    //         children: [
+                    //           Text(
+                    //             "Fund Wallet",
+                    //             style: TextStyle(
+                    //               color: MyColors.neutralblack,
+                    //               fontSize: 16,
+                    //               fontFamily: "Inter",
+                    //               fontWeight: FontWeight.w400,
+                    //             ),
+                    //           ),
+                    //           SizedBox(
+                    //             height: 10,
+                    //           ),
+                    //           Container(
+                    //             width: MediaQuery.of(context).size.width * .8,
+                    //             child: Text(
+                    //               "Start your real estate journey by funding your wallet",
+                    //               style: TextStyle(
+                    //                 color: MyColors.neutral,
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w400,
+                    //                 fontFamily: "Inter",
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ],
+                    //       ),
+                    //       SvgPicture.asset("images/direction_right.svg")
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 40,
+                    // ),
+
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       Text(
+                    //         "Your Friends",
+                    //         style: TextStyle(
+                    //           color: MyColors.primaryDark,
+                    //           fontWeight: FontWeight.w500,
+                    //           fontSize: 18,
+                    //           fontFamily: "Inter",
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           Navigator.pushNamed(context, MyFriends.id).then((value) {
+                    //             fetchFriends();
+                    //           });
+                    //         },
+                    //         child: Row(
+                    //           children: [
+                    //             Text(
+                    //               "Friends List ",
+                    //               style: TextStyle(
+                    //                 color: MyColors.primary,
+                    //                 fontWeight: FontWeight.w400,
+                    //                 fontSize: 12,
+                    //                 fontFamily: "Inter",
+                    //               ),
+                    //             ),
+                    //             SvgPicture.asset("images/direction_right_blue.svg")
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: 40,
+                    // ),
+                    // Container(
+                    //   height: 100,
+                    //   padding: EdgeInsets.symmetric(horizontal: 20),
+                    //   child: ListView.builder(
+                    //       itemCount: _friends.length,
+                    //       scrollDirection: Axis.horizontal,
+                    //       itemBuilder: (context, index) {
+                    //         User friend = _friends[index];
+                    //         return Row(
+                    //           children: [
+                    //             Column(
+                    //               mainAxisAlignment: MainAxisAlignment.center,
+                    //               crossAxisAlignment: CrossAxisAlignment.center,
+                    //               children: [
+                    //                 Container(
+                    //                     clipBehavior: Clip.hardEdge,
+                    //                     height: 64,
+                    //                     width: 64,
+                    //                     decoration: BoxDecoration(
+                    //                       shape: BoxShape.circle,
+                    //                       // color: Colors.green,
+                    //                     ),
+                    //                     child: friend.avatar != null
+                    //                         ? Image.network(
+                    //                             "${friend.avatar}",
+                    //                             fit: BoxFit.cover,
+                    //                           )
+                    //                         : Icon(
+                    //                             Icons.person_3_rounded,
+                    //                             color: Colors.grey,
+                    //                           )
+                    //                     // child: ,
+                    //                     ),
+                    //                 Text("${friend.firstName}"),
+                    //                 Text("${friend.lastName}"),
+                    //               ],
+                    //             ),
+                    //             SizedBox(
+                    //               width: 10,
+                    //             )
+                    //           ],
+                    //         );
+                    //       }),
+                    // ),
+                    // SizedBox(
+                    //   height: 50,
+                    // ),
+                  ]),
+                ),
+              ),
       ),
     );
   }

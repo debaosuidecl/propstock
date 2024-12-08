@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:propstock/screens/verify_identity/identityUpload.dart';
 import 'package:propstock/widgets/propstock_button.dart';
 
 class VerifyIdentity extends StatefulWidget {
@@ -39,7 +40,7 @@ class _VerifyIdentityState extends State<VerifyIdentity> {
           ),
           onPressed: () {
             // Navigate back to the previous screen when the back button is pressed
-            Navigator.pop(context);
+            Navigator.pop(context, 'success');
           },
         ),
       ),
@@ -103,23 +104,134 @@ class _VerifyIdentityState extends State<VerifyIdentity> {
               SizedBox(
                 height: 20,
               ),
-              if (loading)
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: LinearProgressIndicator(),
+              GestureDetector(
+                onTap: () async {
+                  // Navigator.pushNamed(context, IdentityUpload.id,
+                  //     arguments: "National Identity Number");
+                  var res = await Navigator.pushNamed(
+                      context, IdentityUpload.id,
+                      arguments: "National Identity Number");
+
+                  if (res == "success") {
+                    Navigator.pop(context, 'success');
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffCBDFF7)),
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: ListTile(
+                    title: Text("National Identity Number"),
+                    leading: Container(
+                      height: 16,
+                      width: 16,
+                      margin: EdgeInsets.only(top: 3),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffCBDFF7)),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
                 ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: PropStockButton(
-                    text: "Continue",
-                    disabled: disabledFunc(),
-                    onPressed: () {
-                      // _updateProfile();
-                    }),
               ),
               SizedBox(
-                height: 30,
+                height: 20,
               ),
+              GestureDetector(
+                onTap: () async {
+                  var res = Navigator.pushNamed(context, IdentityUpload.id,
+                      arguments: "International Passport");
+
+                  if (res == "success") {
+                    Navigator.pop(context, 'success');
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffCBDFF7)),
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: ListTile(
+                    title: Text("International Passport"),
+                    leading: Container(
+                      height: 16,
+                      width: 16,
+                      margin: EdgeInsets.only(top: 3),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffCBDFF7)),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // Navigator.pushNamed(context, IdentityUpload.id,
+                  //     arguments: "Drivers License");
+
+                  // Navigator.pushNamed(context, IdentityUpload.id,
+                  //     arguments: "National Identity Number");
+                  var res = await Navigator.pushNamed(
+                      context, IdentityUpload.id,
+                      arguments: "Drivers License");
+
+                  if (res == "success") {
+                    Navigator.pop(context, 'success');
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                  ),
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffCBDFF7)),
+                      borderRadius: BorderRadius.all(Radius.circular(8))),
+                  child: ListTile(
+                    title: Text("Driver’s License"),
+                    leading: Container(
+                      height: 16,
+                      width: 16,
+                      margin: EdgeInsets.only(top: 3),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xffCBDFF7)),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              SizedBox(
+                height: 40,
+              ),
+              // if (loading)
+              //   Padding(
+              //     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              //     child: LinearProgressIndicator(),
+              //   ),
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: 20),
+              //   child: PropStockButton(
+              //       text: "Continue",
+              //       disabled: disabledFunc(),
+              //       onPressed: () {
+              //         // _updateProfile();
+              //       }),
+              // ),
+              // SizedBox(
+              //   height: 30,
+              // ),
             ],
           ),
         ),

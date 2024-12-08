@@ -22,7 +22,7 @@ class LoadingBarPure extends StatelessWidget {
           children: [
             Positioned(
               child: Container(
-                width: 104,
+                width: double.infinity,
                 height: barHeight,
                 decoration: const BoxDecoration(
                   color: Color(0xffEBEDF0),
@@ -36,7 +36,7 @@ class LoadingBarPure extends StatelessWidget {
             ),
             Positioned(
               child: Container(
-                width: 104 * fraction,
+                width: MediaQuery.of(context).size.width * .9 * fraction,
                 height: barHeight,
                 decoration: BoxDecoration(
                   color: filledColor,

@@ -21,10 +21,12 @@ class MarketPlaceSeller extends StatefulWidget {
 class _MarketPlaceSellerState extends State<MarketPlaceSeller> {
   final TextEditingController _unitscontroller = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  String _units = "";
+  String _price = "";
   bool activeAutoInvest = false;
 
   bool _disabledCondition() {
-    return _unitscontroller.text.isEmpty || _priceController.text.isEmpty;
+    return _units.isEmpty || _price.isEmpty;
   }
 
   @override
@@ -119,6 +121,9 @@ class _MarketPlaceSellerState extends State<MarketPlaceSeller> {
                                     // focusNode: _focus,
                                     onChanged: (String value) {
                                       // _onSearchTextChanged(value);
+                                      setState(() {
+                                        _units = value;
+                                      });
                                     },
                                     keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
@@ -176,6 +181,9 @@ class _MarketPlaceSellerState extends State<MarketPlaceSeller> {
                                     // focusNode: _focus,
                                     onChanged: (String value) {
                                       // _onSearchTextChanged(value);
+                                      setState(() {
+                                        _price = value;
+                                      });
                                     },
                                     keyboardType: TextInputType.number,
                                     decoration: InputDecoration(

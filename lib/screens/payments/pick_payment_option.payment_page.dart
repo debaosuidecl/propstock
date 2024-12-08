@@ -1,17 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:pay/pay.dart';
 import 'package:propstock/models/card.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:flutter/services.dart';
 import 'package:propstock/models/property.dart';
 import 'package:propstock/models/user.dart';
+import 'package:propstock/providers/assets.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/providers/buy.dart';
 import 'package:propstock/providers/payment.dart';
 import 'package:propstock/providers/property.dart';
 import 'package:propstock/screens/dashboard.dart';
 import 'package:propstock/screens/investments/investements.dart';
+import 'package:propstock/screens/payments/payment_config.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:provider/provider.dart';
 
@@ -112,6 +117,12 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
             .setFriendAsGift(null);
         Provider.of<PropertyProvider>(context, listen: false)
             .setUserShareInCoInvestment(0);
+        // Provider.of<PropertyProvider>(context, listen: false)
+        //     .selectedInvestmentId = "";
+        Provider.of<AssetsProvider>(context, listen: false)
+            .setIsFinalPayment(false);
+        Provider.of<PropertyProvider>(context, listen: false).isFinalPayment =
+            false;
         Provider.of<BuyPropertyProvider>(context, listen: false)
             .setJustBought(true);
 
@@ -121,13 +132,14 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
         // });
       } else {
         print(response.message);
+        Navigator.pop(context);
       }
     } catch (e) {
       setState(() {
         _processing = false;
       });
       print(e);
-      showErrorDialog("could not start paystack payment", context);
+      showErrorDialog(e.toString(), context);
     } finally {
       setState(() {
         _processing = false;
@@ -199,7 +211,7 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
           children: [
             GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                Navigator.pop(context, "restart");
               },
               child: SvgPicture.asset(
                 "images/close_icon.svg",
@@ -229,40 +241,25 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "Pay with Paystack",
-              style: TextStyle(
-                fontSize: 16,
-                color: MyColors.neutralblack,
-                fontWeight: FontWeight.w400,
-                fontFamily: "Inter",
+            GestureDetector(
+              onTap: () {
+                if (_processing) return;
+                makePayment();
+              },
+              child: Text(
+                "Pay with Paystack",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: MyColors.neutralblack,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: "Inter",
+                ),
               ),
             ),
             GestureDetector(
               onTap: () {
                 if (_processing) return;
                 makePayment();
-                // Navigator.pop(context, "paystack");
-                // PayWithPayStack()
-                //     .now(
-                //         context: context,
-                //         secretKey:
-                //             "sk_test_275794001fe445eeafe4434985fd233fcb166c2c",
-                //         customerEmail: "popekabu@gmail.com",
-                //         reference:
-                //             DateTime.now().microsecondsSinceEpoch.toString() +
-                //                 "3232",
-                //         callbackUrl: "https://twitter.com",
-                //         currency: "NGN",
-                //         paymentChannel: ["mobile_money", "card"],
-                //         amount: "20000",
-                //         transactionCompleted: () {
-                //           print("Transaction Successful^^^^^^^^^^^^");
-                //         },
-                //         transactionNotCompleted: () {
-                //           print("Transaction Not Successful!");
-                //         })
-                //     .then((value) => Navigator.pop(context));
               },
               child: Icon(
                 Icons.keyboard_arrow_right_rounded,
@@ -274,6 +271,30 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
         ),
 
         Divider(),
+        // if (Platform.isAndroid)
+        //   SizedBox(
+        //     height: 17,
+        //   ),
+
+        // if (Platform.isAndroid)
+        //   GooglePayButton(
+        //       width: double.infinity,
+        //       type: GooglePayButtonType.pay,
+        //       onPaymentResult: (result) {
+        //         debugPrint("$result debug print");
+        //       },
+        //       paymentConfiguration:
+        //           PaymentConfiguration.fromJsonString(defaultGooglePay),
+        //       paymentItems: [
+        //         PaymentItem(
+        //           label: "Total",
+        //           status: PaymentItemStatus.final_price,
+        //           amount: _userShare <= 0
+        //               ? "${(_property!.pricePerUnit * _quantity).ceil() / 1350}"
+        //               : "${(_userShare).ceil() / 1350}",
+        //         )
+        //       ]),
+        // if (Platform.isAndroid) Divider(),
 
         SizedBox(
           height: 17,
@@ -282,13 +303,18 @@ class _PickPaymentOptionState extends State<PickPaymentOption> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "Wallet Balance",
-              style: TextStyle(
-                fontSize: 16,
-                color: MyColors.neutralblack,
-                fontWeight: FontWeight.w400,
-                fontFamily: "Inter",
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context, "wallet_pre");
+              },
+              child: Text(
+                "Wallet Balance",
+                style: TextStyle(
+                  fontSize: 16,
+                  color: MyColors.neutralblack,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: "Inter",
+                ),
               ),
             ),
             GestureDetector(

@@ -102,7 +102,7 @@ class _AssetDataState extends State<AssetData> {
         PropStockPieChart(
           assetdist: _assetDistribution,
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         Row(
@@ -144,7 +144,7 @@ class _AssetDataState extends State<AssetData> {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
         //Rental Property
@@ -183,7 +183,7 @@ class _AssetDataState extends State<AssetData> {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
 // COMMERCIAL PROPERTY
@@ -220,7 +220,7 @@ class _AssetDataState extends State<AssetData> {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
 
@@ -258,7 +258,7 @@ class _AssetDataState extends State<AssetData> {
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 20,
         ),
       ],

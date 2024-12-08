@@ -15,7 +15,7 @@ import 'package:propstock/models/user_investment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class InvestmentsProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
 
   UserInvestment? _selectedInvestment;
   UserBankAccount? _selectedBankAccount;
@@ -144,6 +144,7 @@ class InvestmentsProvider with ChangeNotifier {
   }
 
   Property formatProperty(dynamic propItem) {
+    // printlargetring(propItem.toString());
     return Property(
       id: propItem["_id"].toString(),
       about: propItem["about"].toString(),
@@ -157,23 +158,24 @@ class InvestmentsProvider with ChangeNotifier {
       amountFunded: propItem["amountFunded"].toDouble(),
       bedNumber: propItem["bedNumber"].toInt(),
       bathNumber: propItem["bathNumber"].toInt(),
-      longitude: propItem["longitude"].toDouble(),
-      availableUnit: propItem["availableUnit"].toInt(),
-      totalUnits: propItem["totalUnits"].toInt(),
-      leverage: propItem["leverage"].toInt(),
-      minHoldingTime: propItem["minHoldingTime"].toInt(),
+      // longitude: propItem["longitude"].toDouble(),
+      availableUnit: 1000,
+      totalUnits: 1000,
+      // leverage: propItem["leverage"].toInt(),
+      // minHoldingTime: propItem["minHoldingTime"].toInt(),
       certificateOfOccupancy: propItem["certificateOfOccupancy"].toString(),
       governorConsent: propItem["governorConsent"].toString(),
       probateLetterOfAdministration:
           propItem["probateLetterOfAdministration"].toString(),
       excisionGazette: propItem["excisionGazette"].toString(),
       tags: propItem["tags"] as List<dynamic>,
-      latitude: propItem["latitude"].toDouble(),
-      plotNumber: propItem["plotNumber"].toInt(),
+      // latitude: propItem["latitude"].toDouble(),
+      // plotNumber: propItem["plotNumber"].toInt(),
       totalAmountToFund: propItem["totalAmountToFund"].toDouble(),
       propertyType: propItem["propertyType"].toString(),
       investmentType: propItem["investmentType"].toString(),
-      maturitydate: propItem["maturitydate"].toInt(),
+      // maturitydate: propItem["maturitydate"].toInt(),
+      maturitydate: 0,
       status: propItem["status"].toString(),
     );
   }

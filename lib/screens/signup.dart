@@ -1,7 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:propstock/providers/auth.dart';
 import 'package:propstock/screens/email_code_verify.dart';
+import 'package:propstock/screens/location_select.dart';
+import 'package:propstock/screens/modal_sheet.dart';
 import 'package:propstock/screens/onboarding.dart';
 import 'package:propstock/screens/sign_in_with_password.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
@@ -20,12 +23,14 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   String firstName = "";
   String lastName = "";
   String emailAddress = "";
   String password = "";
+  String phoneNumber = "";
   bool? _isChecked = false;
   bool obscuringText = true;
   bool _loading = false;
@@ -54,6 +59,16 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
+    void _showModalBottomSheet(BuildContext context) {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext contextb) {
+          return ModalSheet();
+        },
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -164,6 +179,133 @@ class _SignUpState extends State<SignUp> {
                       const SizedBox(
                         height: 20,
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              // Navigator.pushNamed(context, LocationSelect.id);
+                              _showModalBottomSheet(context);
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * .29,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: const Color(0xffCBDFF7),
+                                ),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(8),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  if (Provider.of<Auth>(context)
+                                      .country!
+                                      .flag
+                                      .isNotEmpty)
+                                    CircleAvatar(
+                                        radius: 15,
+                                        backgroundImage: NetworkImage(
+                                            Provider.of<Auth>(context)
+                                                .country!
+                                                .flag)),
+                                  Expanded(
+                                    child: TextField(
+                                      // controller: _emailController,
+                                      onChanged: (String val) {
+                                        setState(() {
+                                          // phoneNumber = val;
+                                        });
+                                      },
+                                      enabled: false,
+                                      decoration: InputDecoration(
+                                        // suffixIcon: SvgPicture.asset(
+                                        //   "images/down1.svg",
+                                        //   height: 1,
+                                        // ),
+
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 0),
+                                        label: Provider.of<Auth>(context)
+                                                .country!
+                                                .flag
+                                                .isEmpty
+                                            ? Text('code')
+                                            : Text(Provider.of<Auth>(context)
+                                                .country!
+                                                .code!),
+                                        hintStyle:
+                                            TextStyle(color: Color(0xffbbbbbb)),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                        disabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                        focusedBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SvgPicture.asset("images/down1.svg"),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            // child: ,
+                            width: MediaQuery.of(context).size.width * .65,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Color(0xffCBDFF7)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
+                            ),
+
+                            child: TextField(
+                              controller: _phoneController,
+                              onChanged: (String val) {
+                                setState(() {
+                                  phoneNumber = val;
+                                });
+                              },
+                              keyboardType: TextInputType.phone,
+                              decoration: InputDecoration(
+                                // suffixIcon: SvgPicture.asset(
+                                //   "images/down1.svg",
+                                //   height: 1,
+                                // ),
+
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 0),
+                                label: Text('Phone Number'),
+                                hintStyle: TextStyle(color: Color(0xffbbbbbb)),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.transparent),
+                                ),
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: Colors.transparent),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       TextField(
                         controller: _emailController,
                         onChanged: (String val) {
@@ -205,7 +347,7 @@ class _SignUpState extends State<SignUp> {
                             },
                             child: obscuringText
                                 ? Icon(Icons.remove_red_eye)
-                                : Icon(Icons.hide_source_sharp),
+                                : Icon(Icons.remove_red_eye_outlined),
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 10, vertical: 15),
@@ -296,10 +438,17 @@ class _SignUpState extends State<SignUp> {
                       setState(() {
                         _loading = true;
                       });
-                      await Provider.of<Auth>(context, listen: false)
-                          .signup(firstName, lastName, emailAddress, password);
+                      await Provider.of<Auth>(context, listen: false).signup(
+                        firstName,
+                        lastName,
+                        emailAddress,
+                        password,
+                        Provider.of<Auth>(context, listen: false)
+                            .country!
+                            .code!,
+                        phoneNumber,
+                      );
 
-                      // push to fix pin
                       print("done");
 
                       await Navigator.pushNamed(context, EmailCodeVerify.id);

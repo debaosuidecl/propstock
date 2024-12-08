@@ -88,7 +88,7 @@ class _SuccesInvestState extends State<SuccesInvest> {
                               // _showBottomSheet(context);
                               print("going to Assets");
                               Navigator.pushNamedAndRemoveUntil(
-                                  context, Investments.id, (route) {
+                                  context, Assets.id, (route) {
                                 return route.settings.name == Dashboard.id;
                               });
                             },

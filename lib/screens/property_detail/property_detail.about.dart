@@ -59,11 +59,6 @@ class _PropertyDetailAboutState extends State<PropertyDetailAbout> {
                 "${widget.property!.bathNumber} Bath",
                 style: TextStyle(color: MyColors.primary, fontFamily: "Inter"),
               ),
-              SvgPicture.asset("images/line.svg"),
-              Text(
-                "${widget.property!.plotNumber} Plot",
-                style: TextStyle(color: MyColors.primary, fontFamily: "Inter"),
-              )
             ],
           ),
         ),

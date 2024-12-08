@@ -4,13 +4,29 @@ import 'package:propstock/providers/buy.dart';
 import 'package:propstock/providers/contact.dart';
 import 'package:propstock/providers/faqs.dart';
 import 'package:propstock/providers/investments.dart';
+import 'package:propstock/providers/listings.dart';
 import 'package:propstock/providers/marketplace.dart';
 import 'package:propstock/providers/notifications.dart';
 import 'package:propstock/providers/payment.dart';
 import 'package:propstock/providers/portfolio.dart';
 import 'package:propstock/providers/property.dart';
+import 'package:propstock/screens/affiliate/about_listing_property.dart';
+import 'package:propstock/screens/affiliate/about_listing_property_b.dart';
 import 'package:propstock/screens/affiliate/affiliate.dart';
+import 'package:propstock/screens/affiliate/affiliate_terms_and_conditions.dart';
+import 'package:propstock/screens/affiliate/listing.dart';
+import 'package:propstock/screens/affiliate/listing_property_detail.dart';
+import 'package:propstock/screens/affiliate/property_photos.dart';
+import 'package:propstock/screens/affiliate/select_listing_type.dart';
+import 'package:propstock/screens/affiliate/sign_exclusivity_form.dart';
+import 'package:propstock/screens/affiliate/sign_exlusivity_form_action.dart';
+import 'package:propstock/screens/affiliate/signature_canvas.dart';
+import 'package:propstock/screens/affiliate/text_sign.dart';
+import 'package:propstock/screens/affiliate/upload_property_document.dart';
 import 'package:propstock/screens/assets/assets.dart';
+import 'package:propstock/screens/assets/co_invest_asset.dart';
+import 'package:propstock/screens/assets/property_status.dart';
+import 'package:propstock/screens/assets/property_status_coinvestors.dart';
 import 'package:propstock/screens/bank_account/add_bank_account.dart';
 import 'package:propstock/screens/bank_account/confirm_bank_account.dart';
 import 'package:propstock/screens/buy_property/buy_property_detail.overview.dart';
@@ -37,7 +53,9 @@ import 'package:propstock/screens/forgot_pin.dart';
 import 'package:propstock/screens/friends/myfriends.dart';
 import 'package:propstock/screens/got_verification_mail.dart';
 import 'package:propstock/screens/home/profile.dart';
+import 'package:propstock/screens/home/setup_completion.dart';
 import 'package:propstock/screens/income_range.dart';
+import 'package:propstock/screens/invest.main.dart';
 import 'package:propstock/screens/invest/co_invest.dart';
 import 'package:propstock/screens/invest/co_invest_final.dart';
 import 'package:propstock/screens/invest/send_investment_as_gifts.dart';
@@ -63,6 +81,7 @@ import 'package:propstock/screens/payment_card/add_card.dart';
 import 'package:propstock/screens/payment_method/debit_cards.dart';
 import 'package:propstock/screens/payment_method/payment_method.dart';
 import 'package:propstock/screens/payment_method/single_debit_card.dart';
+import 'package:propstock/screens/portfolio_cover.dart';
 import 'package:propstock/screens/preferences/preferences.dart';
 import 'package:propstock/screens/primary_goal.dart';
 import 'package:propstock/screens/privacy_and_safety/privacy_and_safety.dart';
@@ -84,8 +103,10 @@ import 'package:propstock/screens/signup.dart';
 import 'package:propstock/screens/invest/buy_units_invest_page.dart';
 import 'package:propstock/screens/terms_and_conditions.dart';
 import 'package:propstock/screens/verify_account/verify_account.dart';
+import 'package:propstock/screens/verify_identity/identityUpload.dart';
 import 'package:propstock/screens/verify_identity/verify_identity.dart';
 import 'package:propstock/screens/wallet/switch_cards.dart';
+import 'package:propstock/screens/wallet/wallet.dart';
 import 'package:propstock/screens/wallet/wallet_transaction_page.dart';
 import 'package:provider/provider.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -125,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ChangeNotifierProvider(create: (context) => FaqsProvider()),
         ChangeNotifierProvider(create: (context) => ContactProvider()),
         ChangeNotifierProvider(create: (context) => AssetsProvider()),
+        ChangeNotifierProvider(create: (context) => ListingsProvider()),
       ],
       child: OverlaySupport(
         child: MaterialApp(
@@ -179,7 +201,8 @@ class _MyHomePageState extends State<MyHomePage> {
             AddBankAccount.id: (context) => const AddBankAccount(),
             ConfirmBankAccount.id: (context) => const ConfirmBankAccount(),
             InvestmentPortfolioSubScreen.id: (context) =>
-                const ConfirmBankAccount(),
+                const InvestmentPortfolioSubScreen(),
+            Invest.id: (context) => const Invest(),
             SwitchCards.id: (context) => SwitchCards(),
             WalletTransactionPage.id: (context) =>
                 const WalletTransactionPage(),
@@ -187,6 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
             MarketPlaceFilter.id: (context) => const MarketPlaceFilter(),
             BuyPropertyDetailOverview.id: (context) =>
                 const BuyPropertyDetailOverview(),
+            PortfolioCover.id: (context) => const PortfolioCover(),
             BuyPropertyUnitsPage.id: (context) => const BuyPropertyUnitsPage(),
             DocumentHandover.id: (context) => const DocumentHandover(),
             SendPropertyAsGift.id: (context) => const SendPropertyAsGift(),
@@ -228,7 +252,32 @@ class _MyHomePageState extends State<MyHomePage> {
             PaymentMethodProfile.id: (context) => const PaymentMethodProfile(),
             DebitCardsProfile.id: (context) => const DebitCardsProfile(),
             SingleDebitCardProfile.id: (context) =>
-                const SingleDebitCardProfile()
+                const SingleDebitCardProfile(),
+            PropertyStatus.id: (context) => const PropertyStatus(),
+            PropertyStatusCoInvestors.id: (context) =>
+                const PropertyStatusCoInvestors(),
+            CoInvestFinalPageAsset.id: (context) =>
+                const CoInvestFinalPageAsset(),
+            CompleteSetupHome.id: (context) => const CompleteSetupHome(),
+            WalletPage.id: (context) => const WalletPage(),
+            AffiliateTermsAndConditions.id: (context) =>
+                const AffiliateTermsAndConditions(),
+            IdentityUpload.id: (context) => const IdentityUpload(),
+            SignExclusivityForm.id: (context) => const SignExclusivityForm(),
+            SignExclusivityFormAction.id: (context) =>
+                const SignExclusivityFormAction(),
+            SignatureCanvasPage.id: (context) => const SignatureCanvasPage(),
+            TextSignAffiliate.id: (context) => const TextSignAffiliate(),
+            AffiliateListing.id: (context) => const AffiliateListing(),
+            SelectListingType.id: (context) => const SelectListingType(),
+            AboutListingProperty.id: (context) => const AboutListingProperty(),
+            AboutListingPropertyB.id: (context) =>
+                const AboutListingPropertyB(),
+            PropertyPhotosAffiliate.id: (context) =>
+                const PropertyPhotosAffiliate(),
+            UploadPropertyDocument.id: (context) =>
+                const UploadPropertyDocument(),
+            ListingPropertyDetail.id: (context) => const ListingPropertyDetail()
           },
         ),
       ),

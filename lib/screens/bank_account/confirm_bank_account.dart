@@ -78,139 +78,141 @@ class _ConfirmBankAccountState extends State<ConfirmBankAccount> {
 
   @override
   Widget build(BuildContext context) {
-    final UserBankAccount bankAccount =
-        ModalRoute.of(context)!.settings.arguments as UserBankAccount;
-    return Scaffold(
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: SingleChildScrollView(
-            child: Container(
-              height: MediaQuery.of(context).size.height * .9,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
+    final UserBankAccount? bankAccount =
+        ModalRoute.of(context)!.settings.arguments as UserBankAccount?;
+    return bankAccount == null
+        ? Center(child: Text("not available"))
+        : Scaffold(
+            body: SafeArea(
+              child: GestureDetector(
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                },
+                child: SingleChildScrollView(
+                  child: Container(
+                    height: MediaQuery.of(context).size.height * .9,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: SvgPicture.asset(
-                                  "images/back_arrow.svg",
-                                  height: 32,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: SvgPicture.asset(
+                                        "images/back_arrow.svg",
+                                        height: 32,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  "Confirm Account",
+                                  style: TextStyle(
+                                    color: MyColors.secondary,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(
-                          height: 20,
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  "Confirm your bank account and make sure all the details below are correct.",
+                                  style: TextStyle(
+                                    color: MyColors.neutral,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  bankAccount.accountName,
+                                  style: TextStyle(
+                                    color: MyColors.primaryDark,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              if (_loading)
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  child: LinearProgressIndicator(),
+                                ),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 20),
+                                child: Text(
+                                  bankAccount.bank.name,
+                                  style: TextStyle(
+                                    color: MyColors.neutral,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            "Confirm Account",
-                            style: TextStyle(
-                              color: MyColors.secondary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                            ),
+                          child: PropStockButton(
+                            disabled: false,
+                            onPressed: () async {
+                              // _showSuccessModal(context);
+                              setState(() {
+                                _loading = true;
+                              });
+                              try {
+                                await Provider.of<PaymentProvider>(context,
+                                        listen: false)
+                                    .saveUserBankAccount(bankAccount);
+                                _showSuccessModal(context);
+                              } catch (e) {
+                                showErrorDialog(e.toString(), context);
+                              } finally {
+                                setState(() {
+                                  _loading = false;
+                                });
+                              }
+                            },
+                            text: "Continue",
                           ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            "Confirm your bank account and make sure all the details below are correct.",
-                            style: TextStyle(
-                              color: MyColors.neutral,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            bankAccount.accountName,
-                            style: TextStyle(
-                              color: MyColors.primaryDark,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        if (_loading)
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: LinearProgressIndicator(),
-                          ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            bankAccount.bank.name,
-                            style: TextStyle(
-                              color: MyColors.neutral,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
+                        )
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: PropStockButton(
-                      disabled: false,
-                      onPressed: () async {
-                        // _showSuccessModal(context);
-                        setState(() {
-                          _loading = true;
-                        });
-                        try {
-                          await Provider.of<PaymentProvider>(context,
-                                  listen: false)
-                              .saveUserBankAccount(bankAccount);
-                          _showSuccessModal(context);
-                        } catch (e) {
-                          showErrorDialog(e.toString(), context);
-                        } finally {
-                          setState(() {
-                            _loading = false;
-                          });
-                        }
-                      },
-                      text: "Continue",
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 }

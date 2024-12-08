@@ -82,7 +82,7 @@ class HomeHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            SvgPicture.asset("images/Compass.svg"),
+            // SvgPicture.asset("images/Compass.svg"),
             SizedBox(
               width: 10,
             ),

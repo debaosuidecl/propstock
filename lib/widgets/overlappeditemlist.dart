@@ -13,7 +13,8 @@ class OverLappedItemList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: Alignment.centerLeft,
+      // clipBehavior: Clip.none,
+      alignment: Alignment.center,
       children: users.asMap().entries.map((entry) {
         int index = entry.key;
         User user = entry.value;

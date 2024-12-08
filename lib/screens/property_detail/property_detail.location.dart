@@ -48,14 +48,14 @@ class _PropertyDetailLocationState extends State<PropertyDetailLocation> {
         SizedBox(
           height: 10,
         ),
-        Container(
-          height: 340,
-          child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-            target: LatLng(48.8698679, 2.3072976),
-            zoom: 4.5,
-          )),
-        ),
+        // Container(
+        //   height: 340,
+        //   child: GoogleMap(
+        //       initialCameraPosition: CameraPosition(
+        //     target: LatLng(48.8698679, 2.3072976),
+        //     zoom: 4.5,
+        //   )),
+        // ),
         SizedBox(
           height: 50,
         ),

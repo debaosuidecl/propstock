@@ -10,13 +10,17 @@ class UserInvestment {
   String propertyType;
   List<User> coInvestors;
   int maturityDate;
+  User? investor;
   int quantity;
   double pricePerUnitAtPurchase;
   double amountWithdrawn;
   int? createdAt;
+  bool? complete;
   UserInvestment({
     required this.property,
+    this.complete,
     this.isCoInvestor,
+    this.investor,
     this.isInitiatorOfCoInvestment,
     required this.propertyType,
     required this.coInvestors,

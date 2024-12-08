@@ -51,8 +51,10 @@ class _ModalSheetState extends State<ModalSheet> {
         String name = "";
         String flagUrl = "";
         String currency = "";
+        String code = "";
         try {
           name = country['name'];
+          code = country['callingCodes'][0];
           flagUrl = country['flags']['png'];
           currency = country["currencies"]![0]!["code"].toString();
         } catch (e) {
@@ -61,7 +63,12 @@ class _ModalSheetState extends State<ModalSheet> {
           print(" only once here ");
         }
 
-        return Country(flag: flagUrl, name: name, currency: currency);
+        return Country(
+          flag: flagUrl,
+          name: name,
+          currency: currency,
+          code: code,
+        );
       }).toList();
     } else {
       throw Exception('Failed to load countries');
@@ -193,6 +200,8 @@ class _ModalSheetState extends State<ModalSheet> {
                                 });
                                 Provider.of<Auth>(context, listen: false)
                                     .setCountry(countryData);
+                                Provider.of<Auth>(context, listen: false)
+                                    .setCountryString(countryData.name);
                                 print("getting state by country");
                                 try {
                                   await Provider.of<Auth>(context,

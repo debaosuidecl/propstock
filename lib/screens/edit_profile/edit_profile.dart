@@ -7,17 +7,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:local_auth/local_auth.dart';
+// import 'package:local_auth/local_auth.dart';
 import 'package:pinput/pinput.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:propstock/providers/auth.dart';
-import 'package:propstock/screens/create_new_pin.dart';
+// import 'package:propstock/screens/create_new_pin.dart';
 import 'package:propstock/screens/edit_profile/edit_profile_b.dart';
 
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:propstock/widgets/propstock_button.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 enum Appstate { free, picked, cropped }
 
@@ -795,7 +795,7 @@ class _EditProfileState extends State<EditProfile> {
                             Navigator.pushNamed(context, EditProfileB.id);
                           },
                           child: Text(
-                            "Not Completed",
+                            "More Information",
                             style: TextStyle(
                               fontFamily: "Inter",
                               color: MyColors.primary,

@@ -12,7 +12,7 @@ import 'package:propstock/models/user_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MarketPlaceProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
   bool filterMode = false;
   List<String> selectedPropertyTypes = ["All"];
   List<String> selectedFurnitures = ["All"];

@@ -1,4 +1,4 @@
-package com.example.propstock
+package com.ace.propstock
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

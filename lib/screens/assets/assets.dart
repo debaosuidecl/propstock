@@ -5,6 +5,8 @@ import 'package:propstock/models/assets.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:propstock/providers/assets.dart';
 import 'package:propstock/providers/portfolio.dart';
+import 'package:propstock/providers/property.dart';
+import 'package:propstock/screens/assets/property_status.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:propstock/widgets/InvestAssetCard.dart';
 import 'package:propstock/widgets/investAssetCardb.dart';
@@ -51,7 +53,7 @@ class _AssetsState extends State<Assets> {
   // initState
 
   Future<void> _searchAssets(String searchCriteria,
-      {String? propSearch}) async {
+      {String? propSearch, String? realtimesearch}) async {
     try {
       setState(() {
         filter = searchCriteria;
@@ -62,7 +64,7 @@ class _AssetsState extends State<Assets> {
         _page,
         _limit,
         propSearch: propSearch,
-        status: _assetStatusSelect,
+        status: realtimesearch != null ? realtimesearch : _assetStatusSelect,
       );
 
       print("user assets: $userAssets");
@@ -71,7 +73,12 @@ class _AssetsState extends State<Assets> {
         if (userAssets.isEmpty) {
           showSeeMore = false;
         }
-        _userAssets = _userAssets + userAssets;
+
+        if (realtimesearch != null) {
+          _userAssets = userAssets;
+        } else {
+          _userAssets = _userAssets + userAssets;
+        }
       });
     } catch (e) {
       showErrorDialog(e.toString(), context);
@@ -167,9 +174,14 @@ class _AssetsState extends State<Assets> {
                             children: _statusTypes.map((propertyType) {
                               return GestureDetector(
                                 onTap: () {
+                                  print('property type: $propertyType');
                                   setState(() {
                                     _assetStatusSelect = propertyType;
+                                    _userAssets = [];
+                                    _loading = true;
                                   });
+                                  _searchAssets("",
+                                      realtimesearch: propertyType);
 
                                   // _fetchBuyProperties(propertyType: propertyType);
                                 },
@@ -271,8 +283,47 @@ class _AssetsState extends State<Assets> {
                               margin:
                                   const EdgeInsets.symmetric(horizontal: 20.0),
                               child: GestureDetector(
-                                onTap: () {},
+                                onTap: () {
+                                  Provider.of<PropertyProvider>(context,
+                                              listen: false)
+                                          .selectedInvestmentId =
+                                      asset.userInvestment!.id;
+                                  Navigator.pushNamed(
+                                    context,
+                                    PropertyStatus.id,
+                                    arguments: asset,
+                                  ).then((value) {
+                                    if (value == "success") {
+                                      setState(() {
+                                        loading = true;
+                                      });
+                                      setState(() {
+                                        _userAssets = [];
+                                      });
+                                      _searchAssets("");
+
+                                      final snackBar = SnackBar(
+                                        backgroundColor: MyColors.primary,
+                                        content: Text(
+                                          'You have successfully Paid your co investment',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        action: SnackBarAction(
+                                          label: 'Done',
+                                          onPressed: () {
+                                            // Some code to undo the change.
+                                          },
+                                        ),
+                                      );
+
+                                      // Use ScaffoldMessenger to show the SnackBar.
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
+                                  });
+                                },
                                 child: InvestAssetCardB(
+                                    mode: "Init",
                                     userInvestment: asset.userInvestment),
                               ),
                             );
@@ -282,7 +333,13 @@ class _AssetsState extends State<Assets> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 20.0),
                             child: GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  PropertyStatus.id,
+                                  arguments: asset,
+                                );
+                              },
                               child: PurchaseAssetCardB(
                                   userPurchase: asset.userPurchase),
                             ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:propstock/screens/location_select.dart';
 import 'package:propstock/screens/sign_in_pin.dart';
 import 'package:propstock/screens/sign_in_with_password.dart';
+import 'package:propstock/screens/signup.dart';
 import 'package:propstock/widgets/tiny_circle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -153,7 +154,7 @@ class _OnBoardingState extends State<OnBoarding>
                     width: MediaQuery.of(context).size.width,
                     child: ElevatedButton(
                       onPressed: () {
-                        Navigator.pushNamed(context, LocationSelect.id);
+                        Navigator.pushNamed(context, SignUp.id);
                       },
                       child: Text("Register"),
                       style: ElevatedButton.styleFrom(

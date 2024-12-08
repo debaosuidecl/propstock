@@ -2,10 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:propstock/models/asset_distribution.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:propstock/providers/portfolio.dart';
 import 'package:propstock/screens/investment_portfolio/asset_data.dart';
+import 'package:propstock/screens/investment_portfolio/pie_chart.dart';
+import 'package:propstock/screens/investments/investements.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
+import 'package:propstock/widgets/loading_bar_pure.dart';
 import 'package:provider/provider.dart';
 
 class InvestmentPortfolioSubScreen extends StatefulWidget {
@@ -31,19 +35,42 @@ class _InvestmentPortfolioSubScreenState
   bool _hideBalance = true;
 
   late List<String> timeRanges = ["1D", "1W", "1M", "1Y", "ALL"];
+  AssetDistribution _assetDistribution = AssetDistribution(
+    landCount: 1,
+    rentalCount: 1,
+    commercialCount: 1,
+    residentialCount: 1,
+    sum: 1,
+  );
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _initBalanceFetch();
+    _initAssetData();
+  }
+
+  Future<void> _initAssetData() async {
+    try {
+      final assetData =
+          await Provider.of<PortfolioProvider>(context, listen: false)
+              .fetchAssetDistribution();
+
+      print(assetData);
+      setState(() {
+        _assetDistribution = assetData;
+      });
+    } catch (e) {
+      showErrorDialog("Could not load asset distribution", context);
+    }
   }
 
   Future<void> _initBalanceFetch() async {
     try {
       List<FlSpot> priceData =
           await Provider.of<PortfolioProvider>(context, listen: false)
-              .fetchUserWalletData(searchcriteria);
+              .fetchUserPortfolioData(searchcriteria);
       print(priceData);
 
       setState(() {
@@ -78,6 +105,19 @@ class _InvestmentPortfolioSubScreenState
 
   @override
   Widget build(BuildContext context) {
+    double assetdistributionsum = _assetDistribution.residentialCount +
+        _assetDistribution.commercialCount +
+        _assetDistribution.landCount +
+        _assetDistribution.rentalCount;
+    double residentialFraction =
+        _assetDistribution.residentialCount / assetdistributionsum;
+    double commercialFraction =
+        _assetDistribution.commercialCount / assetdistributionsum;
+    double landCountFraction =
+        _assetDistribution.landCount / assetdistributionsum;
+    double rentalCountFraction =
+        _assetDistribution.rentalCount / assetdistributionsum;
+
     NumberFormat formatter =
         NumberFormat.currency(locale: 'en_US', symbol: "$_currency ");
 
@@ -93,275 +133,533 @@ class _InvestmentPortfolioSubScreenState
                 const SizedBox(
                   height: 20,
                 ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                        ),
 
-                        Text(
-                          "Total Balance",
-                          style: TextStyle(
-                            color: MyColors.neutral,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        // Icon(Icons.eye)
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _hideBalance = !_hideBalance;
-                            });
-                          },
-                          child: _hideBalance
-                              ? Icon(
-                                  Icons.remove_red_eye,
-                                  size: 20,
-                                  color: Colors.grey,
-                                )
-                              : SvgPicture.asset(
-                                  "images/EyeSlash.svg",
-                                  height: 20,
-                                ),
-                        )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 20,
-                        ),
-                        if (_hideBalance)
-                          Text(
-                            formatter.format(_balance),
-                            style: TextStyle(
-                              color: MyColors.primaryDark,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Inter",
-                            ),
-                          ),
-                        if (!_hideBalance)
-                          Text(
-                            " $_currency ******",
-                            style: TextStyle(
-                              fontFamily: "Inter",
-                              color: MyColors.primaryDark,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          )
-                      ],
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 15,
-                        ),
-                        Icon(
-                          growthPercentage > 0
-                              ? Icons.arrow_upward_sharp
-                              : Icons.arrow_downward_sharp,
-                          color: growthPercentage > 0
-                              ? MyColors.success
-                              : MyColors.error,
-                          size: 16,
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          child: Text(
-                            "${(growthPercentage * 100).toStringAsFixed(2)}%",
-                            style: TextStyle(
-                              color: growthPercentage > 0
-                                  ? MyColors.success
-                                  : MyColors.error,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Inter",
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Container(
-                          child: Text(
-                            "(${growthValue > 0 ? '+' : ''}${formatter.format(growthValue)})",
-                            style: TextStyle(
-                              color: growthPercentage > 0
-                                  ? MyColors.success
-                                  : MyColors.error,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              fontFamily: "Inter",
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Container(
-                  height: 196,
-                  child: LineChart(LineChartData(
-                      lineTouchData: LineTouchData(
-                        getTouchedSpotIndicator:
-                            (LineChartBarData barData, List<int> spotIndexes) {
-                          return spotIndexes.map((spotIndex) {
-                            final spot = barData.spots[spotIndex];
-                            if (spot.x == 0 || spot.x == 6) {
-                              return null;
-                            }
-                            return TouchedSpotIndicatorData(
-                              FlLine(
-                                color: Colors.black,
-                                strokeWidth: 1,
-                                dashArray: [1, 4],
-                              ),
-                              FlDotData(
-                                getDotPainter: (spot, percent, barData, index) {
-                                  return FlDotCirclePainter(
-                                    radius: 1,
-                                    color: Colors.white,
-                                    strokeWidth: 1,
-                                    strokeColor: Colors.white,
-                                  );
-                                },
-                              ),
-                            );
-                          }).toList();
-                        },
-                        touchTooltipData: LineTouchTooltipData(
-                          fitInsideHorizontally: true,
-                          tooltipBorder: BorderSide.none,
-                          showOnTopOfTheChartBoxArea: false,
-                          tooltipRoundedRadius: 10,
-                          tooltipHorizontalOffset: 5,
-                          tooltipBgColor:
-                              Colors.white, // Background color of the tooltip
-                          getTooltipItems: (touchedSpots) {
-                            return touchedSpots.map((touchedSpot) {
-                              DateTime date =
-                                  DateTime.fromMillisecondsSinceEpoch(
-                                      touchedSpot.x.toInt());
-                              String formattedDate =
-                                  DateFormat('MMMM dd, yyyy').format(date);
-
-                              return LineTooltipItem(
-                                // direction
-                                // textDirection: TextDirection.,
-                                children: [
-                                  // TextSpan(
-                                  //   text: "Hi",
-                                  //   style: TextStyle(color: Colors.black),
-                                  // )
-                                ],
-                                '${formattedDate}', // Customize the label
-                                TextStyle(color: Colors.black),
-                              );
-                            }).toList();
-                          },
-                        ),
-                      ),
-                      borderData: FlBorderData(show: false),
-                      titlesData: FlTitlesData(
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ), // Hide Y-axis labels
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ), // Hide X-axis labels
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ), // Hide Y-axis labels
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ), // Hide X-axis labels
-                      ),
-                      gridData: FlGridData(show: false),
-                      minY: balanceData.map((v) {
-                            return v.y;
-                          }).reduce((value, element) =>
-                              value < element ? value : element) /
-                          2,
-                      // baselineX: 0,
-                      lineBarsData: [
-                        LineChartBarData(
-                            spots: balanceData,
-                            // isCurved: true,
-                            dotData: FlDotData(show: false),
-                            color: Colors.blue,
-                            barWidth: 1,
-                            belowBarData: BarAreaData(
-                                show: true,
-                                gradient: LinearGradient(
-                                  // begin: ,
-                                  begin: Alignment
-                                      .topCenter, // Start at the top-left corner
-                                  end: Alignment
-                                      .bottomCenter, // End at the bottom-right corner
-                                  colors: [
-                                    Color(0xffD4E8FF),
-                                    Colors.white,
-                                  ],
-                                )))
-                      ])),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Text(
+                    "Portfolio",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 24,
+                        fontFamily: "Inter"),
+                  ),
                 ),
                 const SizedBox(
                   height: 20,
                 ),
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: timeRanges.map((timerange) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            searchcriteria = timerange;
-                          });
-                          _initBalanceFetch();
-                        },
-                        child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            // color: Colors.blue,
-                            child: Text(timerange,
-                                style: TextStyle(
-                                  color: timerange == searchcriteria
-                                      ? MyColors.primary
-                                      : MyColors.neutral,
-                                  fontFamily: "Inter",
-                                  fontSize: 14,
-                                ))),
-                      );
-                    }).toList()),
-                SizedBox(
-                  height: 15,
-                ),
-                SizedBox(
-                  height: 40,
-                ),
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                          ),
+
+                          Text(
+                            "Total Balance",
+                            style: TextStyle(
+                              color: MyColors.neutral,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          // Icon(Icons.eye)
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _hideBalance = !_hideBalance;
+                              });
+                            },
+                            child: _hideBalance
+                                ? Icon(
+                                    Icons.remove_red_eye,
+                                    size: 20,
+                                    color: Colors.grey,
+                                  )
+                                : SvgPicture.asset(
+                                    "images/EyeSlash.svg",
+                                    height: 20,
+                                  ),
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 20,
+                          ),
+                          if (_hideBalance)
+                            Text(
+                              formatter.format(_balance),
+                              style: TextStyle(
+                                color: MyColors.primaryDark,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          if (!_hideBalance)
+                            Text(
+                              " $_currency ******",
+                              style: TextStyle(
+                                fontFamily: "Inter",
+                                color: MyColors.primaryDark,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Row(
+                        children: [
+                          SizedBox(
+                            width: 15,
+                          ),
+                          Icon(
+                            growthPercentage > 0
+                                ? Icons.arrow_upward_sharp
+                                : Icons.arrow_downward_sharp,
+                            color: growthPercentage > 0
+                                ? MyColors.success
+                                : MyColors.error,
+                            size: 16,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            child: Text(
+                              "${(growthPercentage * 100).toStringAsFixed(2)}%",
+                              style: TextStyle(
+                                color: growthPercentage > 0
+                                    ? MyColors.success
+                                    : MyColors.error,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            child: Text(
+                              "(${growthValue > 0 ? '+' : ''}${formatter.format(growthValue)})",
+                              style: TextStyle(
+                                color: growthPercentage > 0
+                                    ? MyColors.success
+                                    : MyColors.error,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      //   ],
+                      // ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
+                        height: 196,
+                        child: LineChart(LineChartData(
+                            lineTouchData: LineTouchData(
+                              getTouchedSpotIndicator:
+                                  (LineChartBarData barData,
+                                      List<int> spotIndexes) {
+                                return spotIndexes.map((spotIndex) {
+                                  final spot = barData.spots[spotIndex];
+                                  if (spot.x == 0 || spot.x == 6) {
+                                    return null;
+                                  }
+                                  return TouchedSpotIndicatorData(
+                                    FlLine(
+                                      color: Colors.black,
+                                      strokeWidth: 1,
+                                      dashArray: [1, 4],
+                                    ),
+                                    FlDotData(
+                                      getDotPainter:
+                                          (spot, percent, barData, index) {
+                                        return FlDotCirclePainter(
+                                          radius: 1,
+                                          color: Colors.white,
+                                          strokeWidth: 1,
+                                          strokeColor: Colors.white,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              touchTooltipData: LineTouchTooltipData(
+                                fitInsideHorizontally: true,
+                                tooltipBorder: BorderSide.none,
+                                showOnTopOfTheChartBoxArea: false,
+                                tooltipRoundedRadius: 10,
+                                tooltipHorizontalOffset: 5,
+                                tooltipBgColor: Colors
+                                    .white, // Background color of the tooltip
+                                getTooltipItems: (touchedSpots) {
+                                  return touchedSpots.map((touchedSpot) {
+                                    DateTime date =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            touchedSpot.x.toInt());
+                                    String formattedDate =
+                                        DateFormat('MMMM dd, yyyy')
+                                            .format(date);
+
+                                    return LineTooltipItem(
+                                      // direction
+                                      // textDirection: TextDirection.,
+                                      children: [
+                                        // TextSpan(
+                                        //   text: "Hi",
+                                        //   style: TextStyle(color: Colors.black),
+                                        // )
+                                      ],
+                                      '${formattedDate}', // Customize the label
+                                      TextStyle(color: Colors.black),
+                                    );
+                                  }).toList();
+                                },
+                              ),
+                            ),
+                            borderData: FlBorderData(show: false),
+                            titlesData: FlTitlesData(
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ), // Hide Y-axis labels
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ), // Hide X-axis labels
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ), // Hide Y-axis labels
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ), // Hide X-axis labels
+                            ),
+                            gridData: FlGridData(show: false),
+                            minY: balanceData.isNotEmpty
+                                ? balanceData.map((v) {
+                                      return v.y;
+                                    }).reduce((value, element) =>
+                                        value < element ? value : element) /
+                                    2
+                                : 0,
+                            // baselineX: 0,
+                            lineBarsData: [
+                              LineChartBarData(
+                                  spots: balanceData,
+                                  // isCurved: true,
+                                  dotData: FlDotData(show: false),
+                                  color: Colors.blue,
+                                  barWidth: 1,
+                                  belowBarData: BarAreaData(
+                                      show: true,
+                                      gradient: LinearGradient(
+                                        // begin: ,
+                                        begin: Alignment
+                                            .topCenter, // Start at the top-left corner
+                                        end: Alignment
+                                            .bottomCenter, // End at the bottom-right corner
+                                        colors: [
+                                          Color(0xffD4E8FF),
+                                          Colors.white,
+                                        ],
+                                      )))
+                            ])),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: timeRanges.map((timerange) {
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  searchcriteria = timerange;
+                                });
+                                _initBalanceFetch();
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  // color: Colors.blue,
+                                  child: Text(timerange,
+                                      style: TextStyle(
+                                        color: timerange == searchcriteria
+                                            ? MyColors.primary
+                                            : MyColors.neutral,
+                                        fontFamily: "Inter",
+                                        fontSize: 14,
+                                      ))),
+                            );
+                          }).toList()),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      SizedBox(
+                        height: 40,
+                      ),
+                      // Container(
+                      //   height: MediaQuery.of(context).size.height,
+                      //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                      //   child: AssetData(),
+                      // )
+                    ]),
+
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: AssetData(),
-                )
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Your Assets",
+                        style: TextStyle(
+                          color: MyColors.primaryDark,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: "Inter",
+                          fontSize: 20,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(context, Investments.id);
+                            },
+                            child: Text(
+                              "See investments",
+                              style: TextStyle(
+                                color: MyColors.primary,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          ),
+                          Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            size: 14,
+                            color: MyColors.primary,
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+
+                PropStockPieChart(
+                  assetdist: _assetDistribution,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Land",
+                        style: TextStyle(
+                          fontFamily: "Inter",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: MyColors.neutral,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * .35,
+                            child: LoadingBarPure(
+                              fraction: _assetDistribution.sum == 0
+                                  ? 0
+                                  : landCountFraction,
+                              filledColor: MyColors.primary,
+                              barHeight: 4.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: 60,
+                            child: Text(
+                              _assetDistribution.sum == 0
+                                  ? "0.00%"
+                                  : "${(landCountFraction * 100).toStringAsFixed(2)}%",
+                              style: TextStyle(
+                                color: MyColors.primary,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: "Inter",
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 20,
+                ),
+                //Rental Property
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Rental Property",
+                        style: TextStyle(
+                          fontFamily: "Inter",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: MyColors.neutral,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * .35,
+                            child: LoadingBarPure(
+                              fraction: rentalCountFraction,
+                              filledColor: MyColors.primaryDark,
+                              barHeight: 4.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: 60,
+                            child: Text(
+                              "${(rentalCountFraction * 100).toStringAsFixed(2)}%",
+                              style: TextStyle(
+                                color: MyColors.primaryDark,
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+// COMMERCIAL PROPERTY
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Commercial Property",
+                        style: TextStyle(
+                          fontFamily: "Inter",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: MyColors.neutral,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * .35,
+                            child: LoadingBarPure(
+                              fraction: commercialFraction,
+                              filledColor: Color(0xffF55D3E),
+                              barHeight: 4.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: 60,
+                            child: Text(
+                              "${(commercialFraction * 100).toStringAsFixed(2)}%",
+                              style: TextStyle(color: Color(0xffF55D3E)),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                // RESIDENTIAL PROPERTY
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Residential Property",
+                        style: TextStyle(
+                          fontFamily: "Inter",
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          color: MyColors.neutral,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * .35,
+                            child: LoadingBarPure(
+                              fraction: residentialFraction,
+                              filledColor: Color(0xff1A936F),
+                              barHeight: 4.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: 60,
+                            child: Text(
+                              "${(residentialFraction * 100).toStringAsFixed(2)}%",
+                              style: TextStyle(color: Color(0xff1A936F)),
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                // Container(
+                //   height: MediaQuery.of(context).size.height,
+                //   padding: const EdgeInsets.symmetric(horizontal: 20),
+                //   child: AssetData(),
+                // ),
               ]));
   }
 }

@@ -292,7 +292,8 @@ class _CoInvestModalState extends State<CoInvestModal> {
 
                     Provider.of<PropertyProvider>(context, listen: false)
                         .setCoInvestors(_coInvestors);
-
+                    Provider.of<PropertyProvider>(context, listen: false)
+                        .setIsCoInvestorPayAfterInitialCoInvestment(false);
                     Provider.of<PropertyProvider>(context, listen: false)
                         .setUserShareInCoInvestment(
                             double.parse(_controller.text));

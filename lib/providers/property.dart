@@ -8,16 +8,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:propstock/models/user.dart';
+import 'package:propstock/providers/assets.dart';
+import 'package:provider/provider.dart';
 // import 'package:propstock/services/crypto.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PropertyProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
   // final String _serverName =
   //     Platform.isIOS ? "http://0.0.0.0:5100" : "http://10.0.2.2:5100";
+  String selectedInvestmentId = "";
 
   Property? _selected_property;
   List<Property> _recommended = [];
+  bool isFinalPayment = false;
+  bool _isCoInvestorPayAfterInitialCoInvestment = false;
   List<Property> _filteredProperties = [];
   bool _filterMode = false;
   double _userShareInCoInvestment = 0;
@@ -65,6 +70,10 @@ class PropertyProvider with ChangeNotifier {
     return _userShareInCoInvestment;
   }
 
+  bool get isCoInvestorPayAfterInitialCoInvestment {
+    return _isCoInvestorPayAfterInitialCoInvestment;
+  }
+
   List<User> get coInvestors {
     return _coInvestors;
   }
@@ -92,6 +101,10 @@ class PropertyProvider with ChangeNotifier {
 
   void setUserShareInCoInvestment(double share) {
     _userShareInCoInvestment = share;
+  }
+
+  void setIsCoInvestorPayAfterInitialCoInvestment(bool response) {
+    _isCoInvestorPayAfterInitialCoInvestment = response;
   }
 
   void setCoInvestors(List<User> coinv) {
@@ -236,7 +249,24 @@ class PropertyProvider with ChangeNotifier {
     }
   }
 
+  printlargetring(String largeString) {
+    int chunkSize = 100;
+
+    // Iterate over the string and print it in chunks
+    for (int i = 0; i < largeString.length; i += chunkSize) {
+      // Calculate the end of the current chunk
+      int end = (i + chunkSize < largeString.length)
+          ? i + chunkSize
+          : largeString.length;
+
+      // Extract and print the current chunk
+      String chunk = largeString.substring(i, end);
+      print(chunk);
+    }
+  }
+
   Property formatProperty(dynamic propItem) {
+    printlargetring(propItem.toString());
     return Property(
       id: propItem["_id"].toString(),
       about: propItem["about"].toString(),
@@ -250,23 +280,24 @@ class PropertyProvider with ChangeNotifier {
       amountFunded: propItem["amountFunded"].toDouble(),
       bedNumber: propItem["bedNumber"].toInt(),
       bathNumber: propItem["bathNumber"].toInt(),
-      longitude: propItem["longitude"].toDouble(),
-      availableUnit: propItem["availableUnit"].toInt(),
-      totalUnits: propItem["totalUnits"].toInt(),
-      leverage: propItem["leverage"].toInt(),
-      minHoldingTime: propItem["minHoldingTime"].toInt(),
+      // longitude: propItem["longitude"].toDouble(),
+      availableUnit: 1000,
+      totalUnits: 1000,
+      // leverage: propItem["leverage"].toInt(),
+      // minHoldingTime: propItem["minHoldingTime"].toInt(),
       certificateOfOccupancy: propItem["certificateOfOccupancy"].toString(),
       governorConsent: propItem["governorConsent"].toString(),
       probateLetterOfAdministration:
           propItem["probateLetterOfAdministration"].toString(),
       excisionGazette: propItem["excisionGazette"].toString(),
       tags: propItem["tags"] as List<dynamic>,
-      latitude: propItem["latitude"].toDouble(),
-      plotNumber: propItem["plotNumber"].toInt(),
+      // latitude: propItem["latitude"].toDouble(),
+      // plotNumber: propItem["plotNumber"].toInt(),
       totalAmountToFund: propItem["totalAmountToFund"].toDouble(),
       propertyType: propItem["propertyType"].toString(),
       investmentType: propItem["investmentType"].toString(),
-      maturitydate: propItem["maturitydate"].toInt(),
+      // maturitydate: propItem["maturitydate"].toInt(),
+      maturitydate: 0,
       status: propItem["status"].toString(),
     );
   }
@@ -370,7 +401,7 @@ class PropertyProvider with ChangeNotifier {
   }
 
   Future<dynamic> queryProperty(String investmentType) async {
-    String url = "$_serverName/api/property?investmentType=$investmentType";
+    String url = "$_serverName/api/property";
     try {
       final token = await gettoken();
       var response = await http.get(
@@ -385,7 +416,8 @@ class PropertyProvider with ChangeNotifier {
         throw (json.decode(response.body)["message"]);
       }
       final responseData = json.decode(response.body)["data"] as List<dynamic>;
-      // print(responseData);
+
+      print(responseData);
       List<Property> properties = [];
 
       for (var i = 0; i < responseData.length; i++) {
@@ -394,10 +426,12 @@ class PropertyProvider with ChangeNotifier {
 
         properties.add(property);
       }
-      print("success");
-      allPropList["$investmentType"] = properties;
 
-      notifyListeners();
+      return properties;
+      // print("success");
+      // allPropList["$investmentType"] = properties;
+
+      // notifyListeners();
     } catch (e) {
       print(e);
       rethrow;
@@ -448,18 +482,23 @@ class PropertyProvider with ChangeNotifier {
   }
 
   Future<dynamic> initializePaystackPayment(
-    Property? selectedProperty,
-    int quantity,
-    double coInvestAmount,
-    List<User> coInvestors,
-    User? friendAsGift,
-    String? paystackType,
-  ) async {
+      Property? selectedProperty,
+      int quantity,
+      double coInvestAmount,
+      List<User> coInvestors,
+      User? friendAsGift,
+      String? paystackType,
+      {String? investmentId}) async {
     String url = "$_serverName/api/property/paystack/payments/initialize";
 
     if (paystackType == "buy" || paystackType == "cobuy") {
       url = "$_serverName/api/property/paystack/payments/buy/initialize";
     }
+
+    // if(isCoInvestorPayAfterInitialCoInvestment){
+    print(
+        " this is the investmen id on property provider: $selectedInvestmentId");
+    // }
     try {
       final token = await gettoken();
       var response = await http.post(
@@ -471,6 +510,13 @@ class PropertyProvider with ChangeNotifier {
               friendAsGift != null ? friendAsGift.id : "",
           "coInvestors": coInvestors.map((e) => e.id).toList(),
           "coInvestAmount": coInvestAmount,
+          "isCoInvestorPayAfterInitialCoInvestment":
+              isCoInvestorPayAfterInitialCoInvestment,
+          "currency": selectedCurrency,
+          "selected_investment_id": selectedInvestmentId,
+          "is_final_payment": isFinalPayment,
+
+          // ""
         }),
         headers: {"Content-Type": "application/json", "x-auth-token": token},
       );

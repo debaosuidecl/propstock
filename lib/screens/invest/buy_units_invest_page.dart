@@ -223,7 +223,7 @@ class _BuyUnitsInvestPageState extends State<BuyUnitsInvestPage> {
                                 ),
                               ),
                               Text(
-                                "1 Plot",
+                                "1 Unit",
                                 style: TextStyle(
                                   fontFamily: "Inter",
                                   fontWeight: FontWeight.w800,
@@ -436,6 +436,10 @@ class _BuyUnitsInvestPageState extends State<BuyUnitsInvestPage> {
                     onPressed: () {
                       Provider.of<PaymentProvider>(context, listen: false)
                           .setPropertyToPay(property, _number);
+
+                      setState(() {
+                        _payment_page = 0;
+                      });
                       _showBottomSheet(context);
                     }),
               )

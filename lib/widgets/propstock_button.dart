@@ -32,6 +32,7 @@ class PropStockButton extends StatelessWidget {
           text,
           style: TextStyle(
             color: Colors.white,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),

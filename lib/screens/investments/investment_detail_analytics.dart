@@ -189,7 +189,8 @@ class _InvestmentDetailAnalyticsState extends State<InvestmentDetailAnalytics> {
 
                     final bool isDocuverified =
                         Provider.of<Auth>(context, listen: false)
-                            .isDocuVerified;
+                                .isDocuVerified ==
+                            true;
 
                     if (!isDocuverified) {
                       Navigator.pop(context);

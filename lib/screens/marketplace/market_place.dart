@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:propstock/models/colors.dart';
 import 'package:propstock/models/market_place.dart';
 import 'package:propstock/providers/marketplace.dart';
 import 'package:propstock/screens/marketplace/market_place_filter.dart';
@@ -75,12 +76,20 @@ class _MarketPlaceState extends State<MarketPlace> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // appBar: AppBar(
-      //   backgroundColor: ,
-      //   title: Text("Market Place", style: TextStyle(),),
-      // ),
-
+      appBar: !Navigator.canPop(context)
+          ? null
+          : AppBar(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    color: MyColors.primaryDark,
+                  )),
+            ),
       body: SafeArea(
         child: Column(children: [
           Container(

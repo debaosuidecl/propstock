@@ -23,6 +23,33 @@ class PurchaseAssetCardB extends StatelessWidget {
     // return 0;
   }
 
+  List<String> months() {
+    return [
+      "Jan",
+      "Feb",
+      "Mar",
+      "April",
+      "May",
+      "June",
+      "July",
+      "Aug",
+      "Sept",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+  }
+
+  int toInt(createdAt) {
+    if (createdAt == null) return 0;
+
+    return createdAt;
+  }
+
+  String getTime(DateTime datetime) {
+    return "${months()[datetime.month - 1]} ${datetime.day}, ${datetime.year}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -53,13 +80,26 @@ class PurchaseAssetCardB extends StatelessWidget {
           Row(
             children: [
               Text(
-                "Completed",
+                userPurchase!.complete == true ? "Completed" : "Incomplete",
                 style: TextStyle(
                   color: Color(0xff1D3354),
-                  fontWeight: FontWeight.w500,
                   fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: "Inter",
                 ),
-              )
+              ),
+              SizedBox(
+                width: 20,
+              ),
+              Text(
+                "${getTime(DateTime.fromMillisecondsSinceEpoch(toInt(userPurchase!.createdAt)))}",
+                style: TextStyle(
+                  color: Color(0xff5E6D85),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                  fontFamily: "Inter",
+                ),
+              ),
             ],
           ),
           SizedBox(

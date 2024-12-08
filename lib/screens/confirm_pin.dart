@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:propstock/providers/auth.dart';
+import 'package:propstock/screens/dashboard.dart';
 import 'package:propstock/screens/intro_survey_page.dart';
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:provider/provider.dart';
@@ -139,7 +140,7 @@ class _ConfirmPinState extends State<ConfirmPin> {
                           await Provider.of<Auth>(context, listen: false)
                               .setPinForUser(_pinController.text);
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => IntroSurveyPage()));
+                              builder: (context) => Dashboard()));
                         }
                       } catch (e) {
                         print(e);

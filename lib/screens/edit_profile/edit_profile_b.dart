@@ -4,16 +4,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:local_auth/local_auth.dart';
-import 'package:pinput/pinput.dart';
+// import 'package:local_auth/local_auth.dart';
+// import 'package:pinput/pinput.dart';
 import 'package:propstock/models/colors.dart';
 import 'package:propstock/providers/auth.dart';
-import 'package:propstock/screens/create_new_pin.dart';
+// import 'package:propstock/screens/create_new_pin.dart';
 
 import 'package:propstock/utils/showErrorDialog.dart';
 import 'package:propstock/widgets/propstock_button.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class EditProfileB extends StatefulWidget {
   static const id = "EditProfileB";
@@ -579,7 +579,7 @@ class _EditProfileBState extends State<EditProfileB> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: PropStockButton(
-                    text: "NEXT",
+                    text: "SAVE",
                     disabled: disabledFunc(),
                     onPressed: () {
                       _updateProfile();

@@ -11,7 +11,7 @@ import 'package:propstock/models/user_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ContactProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
 
   Future<dynamic> getMessages(int page) async {
     String url = "$_serverName/api/contacts/chat/get-messages?page=$page";

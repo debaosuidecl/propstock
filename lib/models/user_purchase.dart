@@ -12,11 +12,15 @@ class UserPurchase {
   int quantity;
   double pricePerUnitAtPurchase;
   int? createdAt;
+  bool? complete;
+  User? investor;
   // double amountWithdrawn;
 
   UserPurchase({
     required this.property,
     this.isCoBuyer,
+    this.complete,
+    this.investor,
     this.isInitiatorOfCoBuying,
     required this.propertyType,
     required this.coBuyers,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:propstock/models/country.dart';
 import 'package:propstock/models/friendActivity.dart';
 import 'package:propstock/models/user.dart';
@@ -29,6 +30,7 @@ class Auth with ChangeNotifier {
   bool? _pushnotify;
   String? _userType;
   int? _dateOfBirth;
+  bool? hasToppedUpWallet;
   String? _dailingcode;
   String? _fullName;
   String? _firstName;
@@ -61,9 +63,13 @@ class Auth with ChangeNotifier {
   String _selectedCurrency = "USD";
   List<dynamic>? _primaryGoals = [];
   bool? _profileSurveyShown;
-  bool _isDocuVerified = false;
+  bool basicInformationComplete = false;
+  bool? _isDocuVerified = false;
+  bool? beingDocVerified = false;
+  String? doc = "";
+  bool? exlusivityDocSigned = false;
   // Timer _authTimer;
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
   // final String _serverName =
   //     Platform.isIOS ? "http://0.0.0.0:5100" : "http://10.0.2.2:5100";
   bool get isAuth {
@@ -71,7 +77,7 @@ class Auth with ChangeNotifier {
     return _token != null;
   }
 
-  bool get isDocuVerified {
+  bool? get isDocuVerified {
     return _isDocuVerified;
   }
 
@@ -253,6 +259,11 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
+  void setCountryString(String name) {
+    _countrystring = name;
+    notifyListeners();
+  }
+
   void setIncomeRange(String irange) {
     _incomeRange = irange;
     notifyListeners();
@@ -420,9 +431,15 @@ class Auth with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<dynamic> _authenticate(String email, String password, bool isSignIn,
-      String? firstName, String? lastName) async {
-    print(email);
+  Future<dynamic> _authenticate(
+      String email,
+      String password,
+      bool isSignIn,
+      String? firstName,
+      String? lastName,
+      String? code,
+      String? phoneNumber) async {
+    print("code is: $code");
     print(password);
     final url =
         isSignIn ? "$_serverName/api/auth" : '$_serverName/api/auth/register';
@@ -437,6 +454,9 @@ class Auth with ChangeNotifier {
           'password': password,
           'firstName': firstName,
           'lastName': lastName,
+          'code': code,
+          'country': country!.name,
+          'phoneNumber': phoneNumber,
 
           // 'returnSecureToken': true,
         },
@@ -451,7 +471,9 @@ class Auth with ChangeNotifier {
             'password': password.trim(),
             'lastName': lastName?.trim(),
             'firstName': firstName?.trim(),
-            "country": country!.name.trim(),
+            'code': code?.trim(),
+            'country': country!.name.trim(),
+            'phoneNumber': phoneNumber?.trim(),
             // 'phone': phone?.trim(),
 
             // 'firebaseToken': firebaseToken
@@ -515,14 +537,15 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> signup(
-      String firstName, String lastName, String email, String password) async {
-    return _authenticate(email, password, false, firstName, lastName);
+  Future<void> signup(String firstName, String lastName, String email,
+      String password, String code, String phoneNumber) async {
+    return _authenticate(
+        email, password, false, firstName, lastName, code, phoneNumber);
   }
 
   Future<void> signin(
       String firstName, String lastName, String email, String password) async {
-    return _authenticate(email, password, true, firstName, lastName);
+    return _authenticate(email, password, true, firstName, lastName, "", "");
   }
 
   Future<void> getIP() async {
@@ -693,6 +716,53 @@ class Auth with ChangeNotifier {
         return profilepic;
       } else {
         print('Failed to upload image');
+        print(response.statusCode);
+        throw ("Failed to upload image");
+      }
+    } catch (e) {
+      print(e);
+
+      rethrow;
+    }
+  }
+
+  Future<String?> uploadIDImage(File imageFile, String documentType) async {
+    String url = "$_serverName/api/user/docupload?documentType=$documentType";
+
+    try {
+      print(imageFile);
+      final token = await gettoken();
+
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(url),
+      );
+      request.headers['x-auth-token'] = token;
+
+      request.files.add(
+        await http.MultipartFile.fromPath('identity', imageFile.path),
+      );
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        print('Image uploaded successfully');
+
+        //  final responseData = json.decode(response);
+        var streamedResponse = await http.Response.fromStream(response);
+
+        // Decode the JSON data from the response body
+        var responseData = json.decode(streamedResponse.body);
+
+        // _profilepic = responseData["data"]["avatar"];
+
+        // print(_profilepic);
+
+        notifyListeners();
+
+        return profilepic;
+      } else {
+        print('Failed to upload image: ${response.statusCode}');
         throw ("Failed to upload image");
       }
     } catch (e) {
@@ -753,7 +823,7 @@ class Auth with ChangeNotifier {
       _firstName = responseData["firstName"].toString();
       _lastName = responseData["lastName"].toString();
       // _token = extractedUserData['token'] as String;
-      _userId = responseData['_id'] as String;
+      _userId = responseData['_id'] as String?;
       // _pin = responseData['pin'] as String?;
       // _isVerified = responseData['verified'] as bool;
       // _isVerified = responseData['verified'] as bool;
@@ -776,6 +846,19 @@ class Auth with ChangeNotifier {
       _preferredStates = responseData["preferredStates"] as List<dynamic>?;
       _propertyTypes = responseData["propertyTypes"] as List<dynamic>?;
       _dateOfBirth = responseData["dateOfBirth"] as int?;
+      hasToppedUpWallet = responseData["hasToppedUpWallet"] as bool?;
+
+      try {
+        basicInformationComplete = _gender!.isNotEmpty &&
+            lastname!.isNotEmpty &&
+            _firstName!.isNotEmpty &&
+            _investmentExperience!.isNotEmpty &&
+            _incomeRange!.isNotEmpty &&
+            _primaryLanguage!.isNotEmpty &&
+            _maritalStatus!.isNotEmpty;
+      } catch (e) {
+        print(e);
+      }
 
       // _isDocuVerified = responseData["isdocuverified"] as bool;
       // _profileSurveyShown = responseData["profileSurveyShown"] as bool?;
@@ -836,6 +919,32 @@ class Auth with ChangeNotifier {
     }
   }
 
+  Future<void> signForm(Uint8List? signImage, String signText) async {
+    String url = "$_serverName/api/user/sign-exclusivity-form";
+    try {
+      final token = await gettoken();
+
+      print({"signImage": signImage, "signText": signText});
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({"signImage": signImage, "signText": signText}),
+      );
+
+      final responseData = json.decode(response.body);
+      print(response.body);
+      if (hasBadRequestError(response.body)) {
+        throw (json.decode(response.body)["message"]);
+      }
+    } catch (e) {
+      print(e);
+      rethrow;
+    }
+  }
+
   Future<void> getStatesByCountry(String country) async {
     String url = "$_serverName/api/user/states/$country";
     try {
@@ -875,7 +984,7 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
-    return _authenticate(email, password, true, "", "");
+    return _authenticate(email, password, true, "", "", "", "");
   }
 
   Future<void> signInWithPin(String pin, String email) async {
@@ -1073,11 +1182,28 @@ class Auth with ChangeNotifier {
       _personalityTypes = responseData["personalityTypes"] as List<dynamic>?;
       _propertyTypes = responseData["propertyTypes"] as List<dynamic>?;
       _dateOfBirth = responseData["dateOfBirth"] as int?;
-
-      _isDocuVerified = responseData["isdocuverified"] as bool;
+      hasToppedUpWallet = responseData["hasToppedUpWallet"] as bool?;
+      _isDocuVerified = responseData["isdocuverified"] as bool?;
+      beingDocVerified = responseData["beingDocVerified"] as bool?;
+      doc = responseData["doc"] as String?;
+      exlusivityDocSigned = responseData["exlusivityDocSigned"] as bool?;
       _profileSurveyShown = responseData["profileSurveyShown"] as bool?;
       // _phone = responseData["phone"] as String;
       print('$_userId is the user id');
+      basicInformationComplete = false;
+
+      try {
+        basicInformationComplete = _gender!.isNotEmpty &&
+            lastname!.isNotEmpty &&
+            _firstName!.isNotEmpty &&
+            _investmentExperience!.isNotEmpty &&
+            _incomeRange!.isNotEmpty &&
+            _primaryLanguage!.isNotEmpty &&
+            _maritalStatus!.isNotEmpty;
+      } catch (e) {
+        print(e);
+      }
+
       // _userId = extractedUserData['userId'] as String;
 
       print("387");

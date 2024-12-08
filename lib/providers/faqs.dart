@@ -10,7 +10,7 @@ import 'package:propstock/models/user_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FaqsProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
 
   Future<List<dynamic>> fetchFaqs(String? search) async {
     String url = "$_serverName/api/faqs?search=$search";

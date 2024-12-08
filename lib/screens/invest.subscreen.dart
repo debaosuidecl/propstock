@@ -32,32 +32,32 @@ class _InvestSubscreenState extends State<InvestSubscreen> {
 
   Future<void> _initPropertyFetch() async {
     try {
-      await Future.wait([
-        Provider.of<PropertyProvider>(context, listen: false).getRecommended(),
-        Provider.of<PropertyProvider>(context, listen: false)
-            .queryProperty("Rental Income"),
-        Provider.of<PropertyProvider>(context, listen: false)
-            .queryProperty("Contract Investment"),
-        Provider.of<PropertyProvider>(context, listen: false)
-            .queryProperty("Buy to Resell"),
-      ]);
-
       final List<Property> recommended =
-          Provider.of<PropertyProvider>(context, listen: false).recommended;
-      final List<Property>? rentalIncome =
-          Provider.of<PropertyProvider>(context, listen: false)
-              .allPropList["Rental Income"];
-      final List<Property>? contractInvestment =
-          Provider.of<PropertyProvider>(context, listen: false)
-              .allPropList["Contract Investment"];
-      final List<Property>? buyToResell =
-          Provider.of<PropertyProvider>(context, listen: false)
-              .allPropList["Buy to Resell"];
+          await Provider.of<PropertyProvider>(context, listen: false)
+              .queryProperty("");
+      // Provider.of<PropertyProvider>(context, listen: false)
+      //     .queryProperty("Rental Income"),
+      // Provider.of<PropertyProvider>(context, listen: false)
+      //     .queryProperty("Contract Investment"),
+      // Provider.of<PropertyProvider>(context, listen: false)
+      //     .queryProperty("Buy to Resell"),
+
+      // final List<Property> recommended =
+      //     Provider.of<PropertyProvider>(context, listen: false).recommended;
+      // final List<Property>? rentalIncome =
+      //     Provider.of<PropertyProvider>(context, listen: false)
+      //         .allPropList["Rental Income"];
+      // final List<Property>? contractInvestment =
+      //     Provider.of<PropertyProvider>(context, listen: false)
+      //         .allPropList["Contract Investment"];
+      // final List<Property>? buyToResell =
+      //     Provider.of<PropertyProvider>(context, listen: false)
+      //         .allPropList["Buy to Resell"];
 
       setState(() {
         _recommendedProperties = recommended;
-        _contractInvestments = contractInvestment;
-        _buyToResell = buyToResell;
+        // _contractInvestments = contractInvestment;
+        // _buyToResell = buyToResell;
         _error = false;
       });
     } catch (e) {
@@ -105,9 +105,9 @@ class _InvestSubscreenState extends State<InvestSubscreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(
-                          height: 40,
-                        ),
+                        // const SizedBox(
+                        //   height: 40,
+                        // ),
                         if (!Provider.of<PropertyProvider>(context,
                                 listen: true)
                             .filterMode)
@@ -117,7 +117,7 @@ class _InvestSubscreenState extends State<InvestSubscreen> {
                                 Column(
                                   children: [
                                     InvestHeader(
-                                      title: "Recommended",
+                                      title: "Properties",
                                       seeAll: () {
                                         Provider.of<PropertyProvider>(context,
                                                 listen: false)
@@ -127,7 +127,7 @@ class _InvestSubscreenState extends State<InvestSubscreen> {
                                       },
                                     ),
                                     const SizedBox(
-                                      height: 20,
+                                      height: 10,
                                     ),
                                     ListView.builder(
                                         physics: NeverScrollableScrollPhysics(),
@@ -145,117 +145,117 @@ class _InvestSubscreenState extends State<InvestSubscreen> {
                                     ),
                                   ],
                                 ),
-                              if (_rentalIncomeInvestments!.length > 0)
-                                Column(
-                                  children: [
-                                    InvestHeader(
-                                      title: "Rental Income Investments",
-                                      seeAll: () {
-                                        Provider.of<PropertyProvider>(context,
-                                                listen: false)
-                                            .setInvestmentType("Rental Income");
-                                        Navigator.pushNamed(context,
-                                            PropertyAllInvestmentType.id);
-                                      },
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    ListView.builder(
-                                        physics: NeverScrollableScrollPhysics(),
-                                        itemCount:
-                                            _rentalIncomeInvestments!.length,
-                                        shrinkWrap: true,
-                                        itemBuilder: (context, index) {
-                                          return InvestCard(
-                                            property: _rentalIncomeInvestments![
-                                                index],
-                                          );
-                                        }),
-                                    const SizedBox(
-                                      height: 40,
-                                    ),
-                                  ],
-                                ),
-                              if (_contractInvestments!.length > 0)
-                                Column(
-                                  children: [
-                                    InvestHeader(
-                                      title: "Contract Investments",
-                                      seeAll: () {
-                                        Provider.of<PropertyProvider>(context,
-                                                listen: false)
-                                            .setInvestmentType(
-                                                "Contract Investment");
-                                        Navigator.pushNamed(context,
-                                            PropertyAllInvestmentType.id);
-                                      },
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              .5),
-                                      // color: Colors.green,
-                                      child: ListView.builder(
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          itemCount:
-                                              _contractInvestments!.length,
-                                          itemBuilder: (context, index) {
-                                            return InvestCard(
-                                              property:
-                                                  _contractInvestments![index],
-                                            );
-                                          }),
-                                    ),
-                                    const SizedBox(
-                                      height: 40,
-                                    ),
-                                  ],
-                                ),
-                              if (_buyToResell!.length > 0)
-                                Column(
-                                  children: [
-                                    InvestHeader(
-                                      title: "Buy to Resell",
-                                      seeAll: () {
-                                        Provider.of<PropertyProvider>(context,
-                                                listen: false)
-                                            .setInvestmentType("Buy to Resell");
-                                        Navigator.pushNamed(context,
-                                            PropertyAllInvestmentType.id);
-                                      },
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                    Container(
-                                      constraints: BoxConstraints(
-                                          maxHeight: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              .5),
-                                      // color: Colors.green,
-                                      child: ListView.builder(
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          itemCount: _buyToResell!.length,
-                                          itemBuilder: (context, index) {
-                                            return InvestCard(
-                                              property: _buyToResell![index],
-                                            );
-                                          }),
-                                    ),
-                                    const SizedBox(
-                                      height: 40,
-                                    ),
-                                  ],
-                                ),
+                              // if (_rentalIncomeInvestments!.length > 0)
+                              //   Column(
+                              //     children: [
+                              //       InvestHeader(
+                              //         title: "Rental Income Investments",
+                              //         seeAll: () {
+                              //           Provider.of<PropertyProvider>(context,
+                              //                   listen: false)
+                              //               .setInvestmentType("Rental Income");
+                              //           Navigator.pushNamed(context,
+                              //               PropertyAllInvestmentType.id);
+                              //         },
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 20,
+                              //       ),
+                              //       ListView.builder(
+                              //           physics: NeverScrollableScrollPhysics(),
+                              //           itemCount:
+                              //               _rentalIncomeInvestments!.length,
+                              //           shrinkWrap: true,
+                              //           itemBuilder: (context, index) {
+                              //             return InvestCard(
+                              //               property: _rentalIncomeInvestments![
+                              //                   index],
+                              //             );
+                              //           }),
+                              //       const SizedBox(
+                              //         height: 40,
+                              //       ),
+                              //     ],
+                              //   ),
+                              // if (_contractInvestments!.length > 0)
+                              //   Column(
+                              //     children: [
+                              //       InvestHeader(
+                              //         title: "Contract Investments",
+                              //         seeAll: () {
+                              //           Provider.of<PropertyProvider>(context,
+                              //                   listen: false)
+                              //               .setInvestmentType(
+                              //                   "Contract Investment");
+                              //           Navigator.pushNamed(context,
+                              //               PropertyAllInvestmentType.id);
+                              //         },
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 20,
+                              //       ),
+                              //       Container(
+                              //         constraints: BoxConstraints(
+                              //             maxHeight: MediaQuery.of(context)
+                              //                     .size
+                              //                     .height *
+                              //                 .5),
+                              //         // color: Colors.green,
+                              //         child: ListView.builder(
+                              //             physics:
+                              //                 NeverScrollableScrollPhysics(),
+                              //             itemCount:
+                              //                 _contractInvestments!.length,
+                              //             itemBuilder: (context, index) {
+                              //               return InvestCard(
+                              //                 property:
+                              //                     _contractInvestments![index],
+                              //               );
+                              //             }),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 40,
+                              //       ),
+                              //     ],
+                              //   ),
+                              // if (_buyToResell!.length > 0)
+                              //   Column(
+                              //     children: [
+                              //       InvestHeader(
+                              //         title: "Buy to Resell",
+                              //         seeAll: () {
+                              //           Provider.of<PropertyProvider>(context,
+                              //                   listen: false)
+                              //               .setInvestmentType("Buy to Resell");
+                              //           Navigator.pushNamed(context,
+                              //               PropertyAllInvestmentType.id);
+                              //         },
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 20,
+                              //       ),
+                              //       Container(
+                              //         constraints: BoxConstraints(
+                              //             maxHeight: MediaQuery.of(context)
+                              //                     .size
+                              //                     .height *
+                              //                 .5),
+                              //         // color: Colors.green,
+                              //         child: ListView.builder(
+                              //             physics:
+                              //                 NeverScrollableScrollPhysics(),
+                              //             itemCount: _buyToResell!.length,
+                              //             itemBuilder: (context, index) {
+                              //               return InvestCard(
+                              //                 property: _buyToResell![index],
+                              //               );
+                              //             }),
+                              //       ),
+                              //       const SizedBox(
+                              //         height: 40,
+                              //       ),
+                              //     ],
+                              //   ),
                             ],
                           )
                         else

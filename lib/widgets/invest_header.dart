@@ -31,27 +31,27 @@ class InvestHeader extends StatelessWidget {
             )
           ],
         ),
-        GestureDetector(
-          onTap: seeAll,
-          child: Row(
-            children: [
-              Text(
-                "See all",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontFamily: "Inter",
-                ),
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              SvgPicture.asset(
-                "images/direction_right.svg",
-                height: 13,
-              )
-            ],
-          ),
-        )
+        // GestureDetector(
+        //   onTap: seeAll,
+        //   child: Row(
+        //     children: [
+        //       Text(
+        //         "See all",
+        //         style: TextStyle(
+        //           color: Colors.blue,
+        //           fontFamily: "Inter",
+        //         ),
+        //       ),
+        //       SizedBox(
+        //         width: 5,
+        //       ),
+        //       SvgPicture.asset(
+        //         "images/direction_right.svg",
+        //         height: 13,
+        //       )
+        //     ],
+        //   ),
+        // )
       ],
     );
   }

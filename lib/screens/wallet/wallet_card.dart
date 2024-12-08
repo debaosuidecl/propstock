@@ -69,7 +69,7 @@ class WalletCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * .4,
+                      width: MediaQuery.of(context).size.width * .35,
                       child: FittedBox(
                         child: Text(formatter.format(wallet!.amount),
                             // overflow: TextOverflow.ellipsis,

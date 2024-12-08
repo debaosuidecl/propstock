@@ -15,7 +15,7 @@ import 'package:propstock/services/crypto.service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentProvider with ChangeNotifier {
-  final String _serverName = "https://jawfish-good-lioness.ngrok-free.app";
+  final String _serverName = "https://app.propstock.tech";
   // final String _serverName =
   //     Platform.isIOS ? "http://0.0.0.0:5100" : "http://10.0.2.2:5100";
 
